@@ -215,17 +215,17 @@ class PSWebDriver {
         return $this.FindElement([Selector]::New($SelectorExpression, $Type))
     }
 
-    [bool]IsElementPresent([Selector]$Selector) {
-        return [bool]($this.FindElement($Selector))
-    }
+    # [bool]IsElementPresent([Selector]$Selector) {
+    #     return [bool]($this.FindElement($Selector))
+    # }
 
     [bool]IsElementPresent([string]$SelectorExpression) {
         return [bool]($this.FindElement([Selector]::Parse($SelectorExpression)))
     }
 
-    [bool]IsElementPresent([string]$SelectorExpression, [SelectorType]$Type) {
-        return [bool]($this.FindElement([Selector]::New($SelectorExpression, $Type)))
-    }
+    # [bool]IsElementPresent([string]$SelectorExpression, [SelectorType]$Type) {
+    #     return [bool]($this.FindElement([Selector]::New($SelectorExpression, $Type)))
+    # }
 
     [bool]IsAlertPresent() {
         if (!$this.Driver) {
