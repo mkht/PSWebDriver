@@ -272,7 +272,7 @@ class PSWebDriver {
         }
     }
 
-    [void]Click([string]$Target, [string]$Value) {
+    [void]Click([string]$Target) {
         $element = $this.FindElement($Target)
         if ($element) {
             $element.Click()
