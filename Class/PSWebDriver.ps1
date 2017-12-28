@@ -194,19 +194,7 @@ class PSWebDriver {
                 }
             }
             if ($SelectorObj) {
-                try {
-                    return $this.Driver.FindElement($SelectorObj)
-
-                }
-                catch {
-                    if ($_.Exception.InnerException.getType().FullName -eq "OpenQA.Selenium.NoSuchElementException") {
-                        Write-Verbose ('No element found.')
-                        return $null
-                    }
-                    else {
-                        throw $_.Exception
-                    }
-                }
+                return $this.Driver.FindElement($SelectorObj)
             }
             return $null
         }
@@ -225,7 +213,12 @@ class PSWebDriver {
     # }
 
     [bool]IsElementPresent([string]$SelectorExpression) {
-        return [bool]($this.FindElement([Selector]::Parse($SelectorExpression)))
+        try {
+            return [bool]($this.FindElement([Selector]::Parse($SelectorExpression)))
+        }
+        catch {
+            return $false
+        }
     }
 
     # [bool]IsElementPresent([string]$SelectorExpression, [SelectorType]$Type) {
