@@ -355,6 +355,27 @@ class PSWebDriver {
         [System.Threading.Thread]::Sleep($WaitTimeInMilliSeconds)
     }
 
+    [string]ExecuteScript([string]$Script){
+        if (!$this.Driver) {
+            $this._WarnBrowserNotStarted()
+            return $null
+        }
+        return [string]($this.Driver.ExecuteScript($Script))
+    }
+
+    [string]ExecuteScript([string]$Target, [string]$Script){
+        if (!$this.Driver) {
+            $this._WarnBrowserNotStarted()
+            return $null
+        }
+        if($element = $this.FindElement($Target)){
+            return [string]($this.Driver.ExecuteScript($Script, $element))
+        }
+        else{
+            return $null
+        }
+    }
+
     [void]SaveScreenShot([string]$FileName, [ImageFormat]$ImageFormat) {
         if (!$this.Driver) {
             $this._WarnBrowserNotStarted()
