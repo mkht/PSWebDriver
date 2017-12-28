@@ -78,7 +78,7 @@ class SpecialKeys {
 
 class PSWebDriver {
     #Properties
-    [ValidateSet("Chrome", "Firefox", "Edge", "HeadlessChrome")] #TODO: Add IE
+    [ValidateSet("Chrome", "Firefox", "Edge", "HeadlessChrome", "IE", "InternetExplorer")]
     [string]$BrowserName
     [SpecialKeys]$SpecialKeys
     $Driver
@@ -111,7 +111,12 @@ class PSWebDriver {
             $Options.AddArgument("--headless")
         }
 
-        $local:tmp = [string]('OpenQA.Selenium.{0}.{0}{1}' -f $this.StrictBrowserName, "Driver")
+        if($this.StrictBrowserName -eq 'IE'){
+            $local:tmp = 'OpenQA.Selenium.IE.InternetExplorerDriver'
+        }
+        else{
+            $local:tmp = [string]('OpenQA.Selenium.{0}.{0}{1}' -f $this.StrictBrowserName, "Driver")
+        }
         #Start browser
         if (!$Options) {
             $this.Driver = New-Object $tmp
@@ -384,9 +389,15 @@ class PSWebDriver {
     }
 
     Hidden [void]_LoadWebDriver() {
-        $local:tmp = [string]("{0}" -f $this.DriverPackage)
-        if (($this.StrictBrowserName -ne "Firefox") -and !(Get-Command "$tmp.exe" -ErrorAction SilentlyContinue)) {
-            $DriverPath = Join-Path $this.PSModuleRoot "\Bin\$tmp"
+        $local:dir = [string]$this.DriverPackage
+        if($this.StrictBrowserName -eq 'IE'){
+            $local:exe = 'IEDriverServer.exe'
+        }
+        else{
+            $local:exe = $dir + '.exe'
+        }
+        if (($this.StrictBrowserName -ne "Firefox") -and !(Get-Command $exe -ErrorAction SilentlyContinue)) {
+            $DriverPath = Join-Path $this.PSModuleRoot "\Bin\$dir"
             if (Resolve-Path $DriverPath -ErrorAction SilentlyContinue) {
                 if ($Env:Path.EndsWith(';')) {
                     $Env:Path += $DriverPath
@@ -396,7 +407,7 @@ class PSWebDriver {
                 }
             }
             else {
-                Write-Error "Couldn't find $tmp"
+                Write-Error "Couldn't find $exe"
             }
         }
     }
