@@ -111,10 +111,10 @@ class PSWebDriver {
             $Options.AddArgument("--headless")
         }
 
-        if($this.StrictBrowserName -eq 'IE'){
+        if ($this.StrictBrowserName -eq 'IE') {
             $local:tmp = 'OpenQA.Selenium.IE.InternetExplorerDriver'
         }
-        else{
+        else {
             $local:tmp = [string]('OpenQA.Selenium.{0}.{0}{1}' -f $this.StrictBrowserName, "Driver")
         }
         #Start browser
@@ -208,10 +208,6 @@ class PSWebDriver {
         return $this.FindElement([Selector]::New($SelectorExpression, $Type))
     }
 
-    # [bool]IsElementPresent([Selector]$Selector) {
-    #     return [bool]($this.FindElement($Selector))
-    # }
-
     [bool]IsElementPresent([string]$SelectorExpression) {
         try {
             return [bool]($this.FindElement([Selector]::Parse($SelectorExpression)))
@@ -220,10 +216,6 @@ class PSWebDriver {
             return $false
         }
     }
-
-    # [bool]IsElementPresent([string]$SelectorExpression, [SelectorType]$Type) {
-    #     return [bool]($this.FindElement([Selector]::New($SelectorExpression, $Type)))
-    # }
 
     [bool]IsAlertPresent() {
         if (!$this.Driver) {
@@ -244,8 +236,6 @@ class PSWebDriver {
             }
         }
     }
-
-
 
     [void]SendKeys([string]$Target, [string]$Value) {
         $element = $this.FindElement($Target)
@@ -358,7 +348,7 @@ class PSWebDriver {
         [System.Threading.Thread]::Sleep($WaitTimeInMilliSeconds)
     }
 
-    [string]ExecuteScript([string]$Script){
+    [string]ExecuteScript([string]$Script) {
         if (!$this.Driver) {
             $this._WarnBrowserNotStarted()
             return $null
@@ -366,15 +356,15 @@ class PSWebDriver {
         return [string]($this.Driver.ExecuteScript($Script))
     }
 
-    [string]ExecuteScript([string]$Target, [string]$Script){
+    [string]ExecuteScript([string]$Target, [string]$Script) {
         if (!$this.Driver) {
             $this._WarnBrowserNotStarted()
             return $null
         }
-        if($element = $this.FindElement($Target)){
+        if ($element = $this.FindElement($Target)) {
             return [string]($this.Driver.ExecuteScript($Script, $element))
         }
-        else{
+        else {
             return $null
         }
     }
@@ -442,10 +432,10 @@ class PSWebDriver {
 
     Hidden [void]_LoadWebDriver() {
         $local:dir = [string]$this.DriverPackage
-        if($this.StrictBrowserName -eq 'IE'){
+        if ($this.StrictBrowserName -eq 'IE') {
             $local:exe = 'IEDriverServer.exe'
         }
-        else{
+        else {
             $local:exe = $dir + '.exe'
         }
         if (($this.StrictBrowserName -ne "Firefox") -and !(Get-Command $exe -ErrorAction SilentlyContinue)) {
