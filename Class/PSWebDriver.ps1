@@ -339,6 +339,16 @@ class PSWebDriver {
         return $this._WaitForBase($sb, $Timeout)
     }
 
+    [bool]WaitForVisible([string]$Target, [int]$Timeout) {
+        $sb = [ScriptBlock] {($this.FindElement($Target).Displayed)}
+        return $this._WaitForBase($sb, $Timeout)
+    }
+
+    [bool]WaitForNotVisible([string]$Target, [int]$Timeout) {
+        $sb = [ScriptBlock] {!($this.FindElement($Target).Displayed)}
+        return $this._WaitForBase($sb, $Timeout)
+    }
+
     [bool]WaitForTitle([string]$Value, [int]$Timeout) {
         $sb = [ScriptBlock] {[string]($this.GetTitle()) -like $Value}
         $sb = $this._ConvertSeleniumPattern($sb, $Value)
