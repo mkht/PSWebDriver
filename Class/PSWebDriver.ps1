@@ -386,6 +386,21 @@ class PSWebDriver {
         }
     }
 
+    [void]Select([string]$Target, [string]$Value) {
+        if (!$this.Driver) {
+            $this._WarnBrowserNotStarted()
+        }
+        else {
+            if ($element = $this.FindElement($Target)) {
+                $SelectElement = $null
+                iex '$SelectElement = New-Object "OpenQA.Selenium.Support.UI.SelectElement" $element' -ea Stop
+                #TODO: Implement SelectByIndex
+                #TODO: Implement SelectByValue
+                $SelectElement.SelectByText($Value)
+            }
+        }
+    }
+
     [void]SaveScreenShot([string]$FileName, [ImageFormat]$ImageFormat) {
         if (!$this.Driver) {
             $this._WarnBrowserNotStarted()
