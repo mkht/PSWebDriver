@@ -271,7 +271,7 @@ class PSWebDriver {
     }
 
     [void]SendKeys([string]$Target, [string]$Value) {
-        $element = $this.FindElement($Target)
+        $element = try {$this.FindElement($Target)}catch {$null}
         if ($element) {
             if (($Value -match '\$\{(KEY_.+)\}') -and ($this.SpecialKeys)) {
                 $Spec = $this.SpecialKeys.ConvertSeleniumKeys($Matches[1])
@@ -282,7 +282,7 @@ class PSWebDriver {
     }
 
     [void]ClearAndType([string]$Target, [string]$Value) {
-        $element = $this.FindElement($Target)
+        $element = try {$this.FindElement($Target)}catch {$null}
         if ($element) {
             $element.Clear()
             if (($Value -match '\$\{(KEY_.+)\}') -and ($this.SpecialKeys)) {
@@ -299,7 +299,7 @@ class PSWebDriver {
     }
 
     [void]Click([string]$Target) {
-        $element = $this.FindElement($Target)
+        $element = try {$this.FindElement($Target)}catch {$null}
         if ($element) {
             $element.Click()
         }
@@ -399,7 +399,7 @@ class PSWebDriver {
             $this._WarnBrowserNotStarted()
             return $null
         }
-        if ($element = $this.FindElement($Target)) {
+        if ($element = try {$this.FindElement($Target)}catch {$null}) {
             return [string]($this.Driver.ExecuteScript($Script, $element))
         }
         else {
@@ -412,7 +412,8 @@ class PSWebDriver {
             $this._WarnBrowserNotStarted()
         }
         else {
-            if ($element = $this.FindElement($Target)) {
+            $element = try {$this.FindElement($Target)}catch {$null}
+            if ($element) {
                 $SelectElement = $null
                 iex '$SelectElement = New-Object "OpenQA.Selenium.Support.UI.SelectElement" $element' -ea Stop
                 #TODO: Implement SelectByIndex
