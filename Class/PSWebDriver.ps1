@@ -142,7 +142,13 @@ class PSWebDriver {
         else {
             [int]$local:tmp = $this.CurrentImplicitWait
             try {
-            $this.Driver.Manage().Timeouts().ImplicitWait = (New-TimeSpan -Seconds $TimeoutInSeconds)
+                if ($TimeoutInSeconds -lt 0) {
+                    $TimeSpan = [System.Threading.Timeout]::InfiniteTimeSpan
+                }
+                else {
+                    $TimeSpan = New-TimeSpan -Seconds $TimeoutInSeconds -ea Stop
+                }
+                $this.Driver.Manage().Timeouts().ImplicitWait = $TimeSpan
                 $this.CurrentImplicitWait = $TimeoutInSeconds
             }
             catch {
