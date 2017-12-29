@@ -1,4 +1,4 @@
-﻿#Require -Version 5.0
+#Require -Version 5.0
 using namespace OpenQA.Selenium
 
 Enum ImageFormat{
@@ -131,7 +131,7 @@ class PSWebDriver {
         $this.Open($URL)
     }
 
-    [void]SetImplicitlyWait([int]$TimeoutInSeconds) {
+    [void]SetImplicitWait([int]$TimeoutInSeconds) {
         if (!$this.Driver) {
             $this._WarnBrowserNotStarted()
         }
