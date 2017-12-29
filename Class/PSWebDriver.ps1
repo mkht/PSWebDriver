@@ -530,6 +530,10 @@ class PSWebDriver {
             return $false
         }
 
+        [int]$tmpWait = $this.CurrentImplicitWait
+        # Set implicit wait to 0 sec temporally.
+        if ($this.Driver) {$this.SetImplicitWait(0)}
+
         $sec = 0;
         [bool]$ret = $false
         do {
