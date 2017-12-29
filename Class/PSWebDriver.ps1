@@ -529,6 +529,10 @@ class PSWebDriver {
 
 
     Hidden [bool]_WaitForBase([ScriptBlock]$Expression, [int]$Timeout) {
+        if (($Timeout -lt 0) -or ($Timeout -gt 3600)) {
+            throw [System.ArgumentOutOfRangeException]::New()
+        }
+
         if (!$this.Driver) {
             $this._WarnBrowserNotStarted()
             return $false
