@@ -86,6 +86,8 @@ class PSWebDriver {
     Hidden [string] $StrictBrowserName
     Hidden [string] $DriverPackage
     Hidden [string] $PSModuleRoot
+    Hidden [int] $DefaultImplicitWait = 5
+    Hidden [int] $CurrentImplicitWait = 5
 
 
     # Constructor
@@ -124,6 +126,8 @@ class PSWebDriver {
         else {
             $this.Driver = New-Object $tmp($Options)
         }
+        #Set default implicit wait
+        if ($this.Driver) {$this.SetImplicitWait($this.DefaultImplicitWait)}
     }
 
     [void]Start([Uri]$URL) {
@@ -136,7 +140,14 @@ class PSWebDriver {
             $this._WarnBrowserNotStarted()
         }
         else {
+            [int]$local:tmp = $this.CurrentImplicitWait
+            try {
             $this.Driver.Manage().Timeouts().ImplicitWait = (New-TimeSpan -Seconds $TimeoutInSeconds)
+                $this.CurrentImplicitWait = $TimeoutInSeconds
+            }
+            catch {
+                $this.CurrentImplicitWait = $tmp
+            }
         }
     }
 
@@ -218,11 +229,18 @@ class PSWebDriver {
     }
 
     [bool]IsElementPresent([string]$SelectorExpression) {
+        [int]$tmpWait = $this.CurrentImplicitWait
         try {
+            # Set implicit wait to 0 sec temporally.
+            if ($this.Driver) {$this.SetImplicitWait(0)}
             return [bool]($this.FindElement([Selector]::Parse($SelectorExpression)))
         }
         catch {
             return $false
+        }
+        finally {
+            # Reset implicit wait
+            if ($this.Driver) {$this.SetImplicitWait($tmpWait)}
         }
     }
 
@@ -518,6 +536,8 @@ class PSWebDriver {
             [System.Threading.Thread]::Sleep(1000)
             $sec++
         } while ($true)
+
+        if ($this.Driver) {$this.SetImplicitWait($tmpWait)}
         return $ret
     }
 
