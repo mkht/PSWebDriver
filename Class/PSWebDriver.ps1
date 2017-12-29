@@ -1,4 +1,4 @@
-#Require -Version 5.0
+﻿#Require -Version 5.0
 using namespace OpenQA.Selenium
 
 Enum ImageFormat{
@@ -545,11 +545,6 @@ class PSWebDriver {
         $sec = 0;
         [bool]$ret = $false
         do {
-            if ($sec -ge $Timeout) {
-                $ret = $false
-                Write-Error 'Timeout'
-                break
-            }
             try {
                 if ($Expression.Invoke()) {
                     $ret = $true
@@ -557,6 +552,11 @@ class PSWebDriver {
                 }
             }
             catch {$ret = $false}
+            if ($sec -ge $Timeout) {
+                $ret = $false
+                Write-Error 'Timeout'
+                break
+            }
             [System.Threading.Thread]::Sleep(1000)
             $sec++
         } while ($true)
