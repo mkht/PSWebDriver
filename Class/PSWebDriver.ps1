@@ -271,6 +271,7 @@ class PSWebDriver {
     }
 
     [void]SendKeys([string]$Target, [string]$Value) {
+        $this.WaitForPageToLoad($this.CurrentImplicitWait)
         $element = try {$this.FindElement($Target)}catch {$null}
         if ($element) {
             if (($Value -match '\$\{(KEY_.+)\}') -and ($this.SpecialKeys)) {
@@ -282,6 +283,7 @@ class PSWebDriver {
     }
 
     [void]ClearAndType([string]$Target, [string]$Value) {
+        $this.WaitForPageToLoad($this.CurrentImplicitWait)
         $element = try {$this.FindElement($Target)}catch {$null}
         if ($element) {
             $element.Clear()
@@ -299,6 +301,7 @@ class PSWebDriver {
     }
 
     [void]Click([string]$Target) {
+        $this.WaitForPageToLoad($this.CurrentImplicitWait)
         $element = try {$this.FindElement($Target)}catch {$null}
         if ($element) {
             $element.Click()
@@ -412,6 +415,7 @@ class PSWebDriver {
             $this._WarnBrowserNotStarted()
         }
         else {
+            $this.WaitForPageToLoad($this.CurrentImplicitWait)
             $element = try {$this.FindElement($Target)}catch {$null}
             if ($element) {
                 $SelectElement = $null
