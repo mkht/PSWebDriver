@@ -293,6 +293,11 @@ class PSWebDriver {
         }
     }
 
+    [bool]WaitForPageToLoad([int]$Timeout) {
+        $sb = [ScriptBlock] {[string]($this.ExecuteScript('return document.readyState;')) -eq 'complete'}
+        return $this._WaitForBase($sb, $Timeout)
+    }
+
     [void]Click([string]$Target) {
         $element = $this.FindElement($Target)
         if ($element) {
