@@ -131,6 +131,15 @@ class PSWebDriver {
         $this.Open($URL)
     }
 
+    [void]SetImplicitlyWait([int]$TimeoutInSeconds) {
+        if (!$this.Driver) {
+            $this._WarnBrowserNotStarted()
+        }
+        else {
+            $this.Driver.Manage().Timeouts().ImplicitWait = (New-TimeSpan -Seconds $TimeoutInSeconds)
+        }
+    }
+
     [void]Quit() {
         if ($this.Driver) {
             try {
