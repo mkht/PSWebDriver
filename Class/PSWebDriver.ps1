@@ -137,6 +137,31 @@ class PSWebDriver {
     }
     #endregion
 
+    #region Method:Get/SetWindowSize()
+    [System.Drawing.Size]GetWindowSize() {
+        if (!$this.Driver) {
+            $this._WarnBrowserNotStarted()
+            return $null
+        }
+        else {
+            return $this.Driver.Manage().Window.Size
+        }
+    }
+
+    [void]SetWindowSize([System.Drawing.Size]$Size) {
+        if (!$this.Driver) {
+            $this._WarnBrowserNotStarted()
+        }
+        else {
+            $this.Driver.Manage().Window.Size = $Size
+        }
+    }
+
+    [void]SetWindowSize([int]$Width, [int]$Height) {
+        $this.SetWindowSize([System.Drawing.Size]::New($Width, $Height))
+    }
+    #endregion
+
     #region Method:Start()
     [void]Start() {
         if ($this.Driver) {
