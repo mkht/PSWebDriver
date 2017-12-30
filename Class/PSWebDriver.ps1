@@ -1,6 +1,7 @@
 ﻿#Require -Version 5.0
 using namespace OpenQA.Selenium
 
+#region Enum:ImageFormat
 Enum ImageFormat{
     Png = 0
     Jpeg = 1
@@ -8,7 +9,9 @@ Enum ImageFormat{
     Tiff = 3
     Bmp = 4
 }
+#endregion
 
+#region Enum:SelectorType
 Enum SelectorType{
     None
     Id
@@ -19,7 +22,9 @@ Enum SelectorType{
     XPath
     Css
 }
+#endregion
 
+#region Class:Selector
 class Selector {
     [string]$Expression
     [SelectorType]$Type = [SelectorType]::None
@@ -55,7 +60,9 @@ class Selector {
         return $ret
     }
 }
+#endregion
 
+#region Class:SpecialKeys
 class SpecialKeys {
     [hashtable]$KeyMap
 
@@ -75,22 +82,26 @@ class SpecialKeys {
         }
     }
 }
+#endregion
 
+#region Class:PSWebDriver
 class PSWebDriver {
-    #Properties
+    #region Public Properties
     [ValidateSet("Chrome", "Firefox", "Edge", "HeadlessChrome", "IE", "InternetExplorer")]
     [string]$BrowserName
     [SpecialKeys]$SpecialKeys
     $Driver
+    #endregion
 
+    #region Hidden properties
     Hidden [string] $StrictBrowserName
     Hidden [string] $DriverPackage
     Hidden [string] $PSModuleRoot
     Hidden [int] $DefaultImplicitWait = 5
     Hidden [int] $CurrentImplicitWait = 5
+    #endregion
 
-
-    # Constructor
+    #region Constructor:PSWebDriver
     PSWebDriver([string]$Browser) {
         $this.PSModuleRoot = Split-Path $PSScriptRoot -Parent
         $this.BrowserName = $Browser
@@ -100,7 +111,33 @@ class PSWebDriver {
         $this._LoadSelenium()
         $this._LoadWebDriver()
     }
+    #endregion
 
+    #region Method:SetImplicitWait()
+    [void]SetImplicitWait([int]$TimeoutInSeconds) {
+        if (!$this.Driver) {
+            $this._WarnBrowserNotStarted()
+        }
+        else {
+            [int]$local:tmp = $this.CurrentImplicitWait
+            try {
+                if ($TimeoutInSeconds -lt 0) {
+                    $TimeSpan = [System.Threading.Timeout]::InfiniteTimeSpan
+                }
+                else {
+                    $TimeSpan = New-TimeSpan -Seconds $TimeoutInSeconds -ea Stop
+                }
+                $this.Driver.Manage().Timeouts().ImplicitWait = $TimeSpan
+                $this.CurrentImplicitWait = $TimeoutInSeconds
+            }
+            catch {
+                $this.CurrentImplicitWait = $tmp
+            }
+        }
+    }
+    #endregion
+
+    #region Method:Start()
     [void]Start() {
         if ($this.Driver) {
             $this.Quit()
@@ -134,29 +171,9 @@ class PSWebDriver {
         $this.Start()
         $this.Open($URL)
     }
+    #endregion
 
-    [void]SetImplicitWait([int]$TimeoutInSeconds) {
-        if (!$this.Driver) {
-            $this._WarnBrowserNotStarted()
-        }
-        else {
-            [int]$local:tmp = $this.CurrentImplicitWait
-            try {
-                if ($TimeoutInSeconds -lt 0) {
-                    $TimeSpan = [System.Threading.Timeout]::InfiniteTimeSpan
-                }
-                else {
-                    $TimeSpan = New-TimeSpan -Seconds $TimeoutInSeconds -ea Stop
-                }
-                $this.Driver.Manage().Timeouts().ImplicitWait = $TimeSpan
-                $this.CurrentImplicitWait = $TimeoutInSeconds
-            }
-            catch {
-                $this.CurrentImplicitWait = $tmp
-            }
-        }
-    }
-
+    #region Method:Quit()
     [void]Quit() {
         if ($this.Driver) {
             try {
@@ -179,7 +196,9 @@ class PSWebDriver {
     [void]Close() {
         $this.Quit()
     }
+    #endregion
 
+    #region Method:Open()
     [void]Open([Uri]$URL) {
         if ($this.Driver) {
             $this.Driver.Navigate().GoToUrl($URL)
@@ -188,7 +207,9 @@ class PSWebDriver {
             $this._WarnBrowserNotStarted()
         }
     }
+    #endregion
 
+    #region Method:GetTitle()
     [string]GetTitle() {
         if (!$this.Driver) {
             $this._WarnBrowserNotStarted()
@@ -198,7 +219,9 @@ class PSWebDriver {
             return [string]$this.Driver.Title
         }
     }
+    #endregion
 
+    #region Method:FindElement()
     [Object]FindElement([Selector]$Selector) {
         if (!$this.Driver) {
             $this._WarnBrowserNotStarted()
@@ -233,7 +256,9 @@ class PSWebDriver {
     [Object]FindElement([string]$SelectorExpression, [SelectorType]$Type) {
         return $this.FindElement([Selector]::New($SelectorExpression, $Type))
     }
+    #endregion
 
+    #region Method:IsElementPresent()
     [bool]IsElementPresent([string]$SelectorExpression) {
         [int]$tmpWait = $this.CurrentImplicitWait
         try {
@@ -249,27 +274,9 @@ class PSWebDriver {
             if ($this.Driver) {$this.SetImplicitWait($tmpWait)}
         }
     }
+    #endregion
 
-    [bool]IsAlertPresent() {
-        if (!$this.Driver) {
-            $this._WarnBrowserNotStarted()
-            return $false
-        }
-        try {
-            $this.Driver.SwitchTo().Alert()
-            return $true
-        }
-        catch {
-            if ($_.Exception.InnerException.getType().FullName -eq "OpenQA.Selenium.NoAlertPresentException") {
-                Write-Verbose ('No Alert open.')
-                return $false
-            }
-            else {
-                throw $_.Exception
-            }
-        }
-    }
-
+    #region Method:Sendkeys() & ClearAndType()
     [void]SendKeys([string]$Target, [string]$Value) {
         $this.WaitForPageToLoad($this.CurrentImplicitWait)
         $element = try {$this.FindElement($Target)}catch {$null}
@@ -294,12 +301,9 @@ class PSWebDriver {
             $element.SendKeys($Value)
         }
     }
+    #endregion
 
-    [bool]WaitForPageToLoad([int]$Timeout) {
-        $sb = [ScriptBlock] {[string]($this.ExecuteScript('return document.readyState;')) -eq 'complete'}
-        return $this._WaitForBase($sb, $Timeout)
-    }
-
+    #region Method:Click()
     [void]Click([string]$Target) {
         $this.WaitForPageToLoad($this.CurrentImplicitWait)
         $element = try {$this.FindElement($Target)}catch {$null}
@@ -307,7 +311,51 @@ class PSWebDriver {
             $element.Click()
         }
     }
+    #endregion
 
+    #region Method:Select()
+    [void]Select([string]$Target, [string]$Value) {
+        if (!$this.Driver) {
+            $this._WarnBrowserNotStarted()
+        }
+        else {
+            $this.WaitForPageToLoad($this.CurrentImplicitWait)
+            $element = try {$this.FindElement($Target)}catch {$null}
+            if ($element) {
+                $SelectElement = $null
+                iex '$SelectElement = New-Object "OpenQA.Selenium.Support.UI.SelectElement" $element' -ea Stop
+                #TODO: Implement SelectByIndex
+                #TODO: Implement SelectByValue
+                $SelectElement.SelectByText($Value)
+            }
+        }
+    }
+    #endregion
+
+    #region Alert handling
+    #region Method:IsAlertPresent()
+    [bool]IsAlertPresent() {
+        if (!$this.Driver) {
+            $this._WarnBrowserNotStarted()
+            return $false
+        }
+        try {
+            $this.Driver.SwitchTo().Alert()
+            return $true
+        }
+        catch {
+            if ($_.Exception.InnerException.getType().FullName -eq "OpenQA.Selenium.NoAlertPresentException") {
+                Write-Verbose ('No Alert open.')
+                return $false
+            }
+            else {
+                throw $_.Exception
+            }
+        }
+    }
+    #endregion
+
+    #region Method:CloseAlertAndGetText()
     [string]CloseAlertAndGetText([bool]$Accept) {
         [string]$AlertText = ''
         try {
@@ -323,12 +371,24 @@ class PSWebDriver {
         catch {}
         return $AlertText
     }
+    #endregion
 
+    #region Method:CloseAlertAndGetText()
     [void]CloseAlert() {
         [void]$this.CloseAlertAndGetText($true)
     }
+    #endregion
+    #endregion Alert handling
 
+    #region WaitFor*
+    #region Method:WaitForPageToLoad()
+    [bool]WaitForPageToLoad([int]$Timeout) {
+        $sb = [ScriptBlock] {[string]($this.ExecuteScript('return document.readyState;')) -eq 'complete'}
+        return $this._WaitForBase($sb, $Timeout)
+    }
+    #endregion
 
+    #region Method:WaitForElementPresent()
     [bool]WaitForElementPresent([string]$Target, [int]$Timeout) {
         $sb = [ScriptBlock] {$this.IsElementPresent($Target)}
         return $this._WaitForBase($sb, $Timeout)
@@ -338,7 +398,9 @@ class PSWebDriver {
         $sb = [ScriptBlock] {!$this.IsElementPresent($Target)}
         return $this._WaitForBase($sb, $Timeout)
     }
+    #endregion
 
+    #region Method:WaitForValue()
     [bool]WaitForValue([string]$Target, [string]$Value, [int]$Timeout) {
         $sb = [ScriptBlock] {[string]($this.FindElement($Target).GetAttribute('value')) -like $Value}
         $sb = $this._ConvertSeleniumPattern($sb, $Value)
@@ -350,7 +412,9 @@ class PSWebDriver {
         $sb = $this._ConvertSeleniumPattern($sb, $Value)
         return $this._WaitForBase($sb, $Timeout)
     }
+    #endregion
 
+    #region Method:WaitForText()
     [bool]WaitForText([string]$Target, [string]$Value, [int]$Timeout) {
         $sb = [ScriptBlock] {[string]($this.FindElement($Target).Text) -like $Value}
         $sb = $this._ConvertSeleniumPattern($sb, $Value)
@@ -362,7 +426,9 @@ class PSWebDriver {
         $sb = $this._ConvertSeleniumPattern($sb, $Value)
         return $this._WaitForBase($sb, $Timeout)
     }
+    #endregion
 
+    #region Method:WaitForVisible()
     [bool]WaitForVisible([string]$Target, [int]$Timeout) {
         $sb = [ScriptBlock] {($this.FindElement($Target).Displayed)}
         return $this._WaitForBase($sb, $Timeout)
@@ -372,7 +438,9 @@ class PSWebDriver {
         $sb = [ScriptBlock] {!($this.FindElement($Target).Displayed)}
         return $this._WaitForBase($sb, $Timeout)
     }
+    #endregion
 
+    #region Method:WaitForTitle()
     [bool]WaitForTitle([string]$Value, [int]$Timeout) {
         $sb = [ScriptBlock] {[string]($this.GetTitle()) -like $Value}
         $sb = $this._ConvertSeleniumPattern($sb, $Value)
@@ -384,11 +452,16 @@ class PSWebDriver {
         $sb = $this._ConvertSeleniumPattern($sb, $Value)
         return $this._WaitForBase($sb, $Timeout)
     }
+    #endregion
+    #endregion WatFor*
 
+    #region Method:Pause()
     [void]Pause([int]$WaitTimeInMilliSeconds) {
         [System.Threading.Thread]::Sleep($WaitTimeInMilliSeconds)
     }
+    #endregion
 
+    #region Method:ExecuteScript()
     [string]ExecuteScript([string]$Script) {
         if (!$this.Driver) {
             $this._WarnBrowserNotStarted()
@@ -409,24 +482,9 @@ class PSWebDriver {
             return $null
         }
     }
+    #endregion
 
-    [void]Select([string]$Target, [string]$Value) {
-        if (!$this.Driver) {
-            $this._WarnBrowserNotStarted()
-        }
-        else {
-            $this.WaitForPageToLoad($this.CurrentImplicitWait)
-            $element = try {$this.FindElement($Target)}catch {$null}
-            if ($element) {
-                $SelectElement = $null
-                iex '$SelectElement = New-Object "OpenQA.Selenium.Support.UI.SelectElement" $element' -ea Stop
-                #TODO: Implement SelectByIndex
-                #TODO: Implement SelectByValue
-                $SelectElement.SelectByText($Value)
-            }
-        }
-    }
-
+    #region Method:SaveScreenShot()
     [void]SaveScreenShot([string]$FileName, [ImageFormat]$ImageFormat) {
         if (!$this.Driver) {
             $this._WarnBrowserNotStarted()
@@ -441,9 +499,9 @@ class PSWebDriver {
     [void]SaveScreenShot([string]$FileName) {
         $this.SaveScreenShot($FileName, [ImageFormat]::Png)
     }
+    #endregion
 
-
-    # Private Method
+    #region Hidden Method
     Hidden [void]_LoadSelenium() {
         $LibPath = Join-Path $this.PSModuleRoot '\Lib'
         if (!("OpenQA.Selenium.By" -as [type])) {
@@ -589,8 +647,9 @@ class PSWebDriver {
         }
         return [scriptblock]::Create($sbstr)
     }
-
+    #endregion Hidden Method
 }
+#endregion
 
 # #forDebug
 # $obj = New-Object PSWebDriver('Chrome')
