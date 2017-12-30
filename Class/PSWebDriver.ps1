@@ -99,6 +99,7 @@ class PSWebDriver {
     Hidden [string] $PSModuleRoot
     Hidden [int] $DefaultImplicitWait = 5
     Hidden [int] $CurrentImplicitWait = 5
+    Hidden [System.Timers.Timer]$Timer
     #endregion
 
     #region Constructor:PSWebDriver
@@ -673,6 +674,104 @@ class PSWebDriver {
         return [scriptblock]::Create($sbstr)
     }
     #endregion Hidden Method
+
+    #region [WIP]recorder
+    Hidden [void]_InitRecorder() {
+        $this._DisposeRecorder()
+
+        $LibPath = Join-Path $this.PSModuleRoot '\Lib'
+        if (!("AnimatedGif" -as [type])) {
+            $local:CSharpCode = gc (Join-Path $LibPath '\AnimatedGif\AnimatedGif.cs') -Raw -ea SilentlyContinue
+            # Load Class
+            try {
+                if ($CSharpCode) {
+                    Add-Type -Language CSharp -TypeDefinition $CSharpCode -ReferencedAssemblies ('PresentationCore', 'WindowsBase', 'System.xaml') -ea Stop
+                }
+            }
+            catch {
+                Write-Error "Couldn't load AnimatedGif Class"
+            }
+        }
+
+        if ("AnimatedGif" -as [type]) {
+            $global:Recorder = New-Object AnimatedGif
+
+            if ($this.Driver) {
+                $global:WebDriver = $this.Driver
+            }
+
+            $this.Timer = New-Object System.Timers.Timer
+            $this.Timer.Interval = 5000
+
+            #forDebug
+            # $global:Logging = @()
+            $Action = {
+                # $ScreenShot
+                if ($global:WebDriver -and $global:Recorder) {
+                    try {
+                        $global:Recorder.AddFrame([byte[]]($global:WebDriver.GetScreenShot().AsByteArray))
+                        #forDebug
+                        # $global:Logging += ("ScreenShot ok:{0}" -f [datetime]::Now.ToString())
+                    }
+                    catch {
+                        #forDebug
+                        # $global:Logging += ("ScreenShot error:{0}" -f [datetime]::Now.ToString())
+                    }
+                }
+            }
+            Register-ObjectEvent -inputObject $this.Timer -eventName Elapsed -sourceIdentifier testEventSample -Action $Action > $null
+        }
+    }
+
+    Hidden [void]_DisposeRecorder() {
+        if ($this.Timer) {
+            try {
+                $this.Timer.Close()
+            }
+            catch {}
+            finally {
+                $this.Timer = $null
+            }
+        }
+
+        Get-EventSubscriber -SourceIdentifier testEventSample -ea SilentlyContinue | Unregister-Event
+
+        if ($global:Recorder) {
+            try {
+                $global:Recorder.Dispose()
+            }
+            catch {}
+            finally {
+                $global:Recorder = $null
+            }
+        }
+
+        if ($global:WebDriver) {
+            $global:WebDriver = $null
+        }
+    }
+
+    [void]StartRecorder() {
+        $this._InitRecorder()
+        if ($this.Timer) {
+            $this.Timer.start()
+        }
+    }
+
+    [void]StopRecorder() {
+        if ($this.Timer) {
+            $this.Timer.Stop()
+        }
+
+        # if($global:Recorder){
+        #     $global:Recorder.Save('F:\testA.gif')
+        # }
+        Unregister-Event testEventSample
+        # $this._DisposeRecorder()
+    }
+
+    #endregion
+
 }
 #endregion
 
