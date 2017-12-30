@@ -57,10 +57,7 @@ PowerShellVersion = '5.0'
 # RequiredAssemblies = @()
 
 # このモジュールをインポートする前に呼び出し元の環境で実行されるスクリプト ファイル (.ps1)。
-ScriptsToProcess = @(
-    'Script\init.ps1'
-    'Class\PSWebDriver.ps1'
-)
+# ScriptsToProcess = @()
 
 # このモジュールをインポートするときに読み込まれる型ファイル (.ps1xml)
 # TypesToProcess = @()
