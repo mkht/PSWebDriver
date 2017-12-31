@@ -30,8 +30,8 @@ public class AnimatedGifWrapper
         this.Converter = new ImageConverter();
     }
 
-    // /// <summary> Gifアニメーションに画像フレームを追加
-    // /// <param name="image">画像フレーム</param>
+    /// <summary> Gifアニメーションに画像フレームを追加
+    /// <param name="image">画像フレーム</param>
     public void AddFrame(Image image) {
         this.ImageList.Add(Compress(image));    //Bitmapのまま格納するとメモリを食い潰すので圧縮保持する
     }
