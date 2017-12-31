@@ -815,8 +815,10 @@ class PSWebDriver {
             }
 
             # Save Animated GIF file
-            if (Get-Variable ('Recorder' + $this.InstanceId) -ea SilentlyContinue) {
-                (Get-Variable ('Recorder' + $this.InstanceId)).Value.Save($FileName, $this.RecordInterval)
+            if ($FileName) {
+                if (Get-Variable ('Recorder' + $this.InstanceId) -ea SilentlyContinue) {
+                    (Get-Variable ('Recorder' + $this.InstanceId)).Value.Save($FileName, $this.RecordInterval)
+                }
             }
 
             Unregister-Event $this.InstanceId
@@ -825,6 +827,11 @@ class PSWebDriver {
         finally {
             $this._DisposeRecorder()
         }
+    }
+
+    #Only stop record. Don't save file
+    [void]StopAnimationRecorder() {
+        $this.StopAnimationRecorder($null)
     }
     #endregion
 
