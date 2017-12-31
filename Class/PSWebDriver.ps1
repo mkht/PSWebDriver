@@ -821,6 +821,7 @@ class PSWebDriver {
                 }
             }
 
+            Unregister-Event $this.InstanceId -ea SilentlyContinue
             Unregister-Event $this.InstanceId
         }
         catch {}
