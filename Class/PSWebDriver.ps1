@@ -690,7 +690,7 @@ class PSWebDriver {
             try {
                 if ($CSharpCode) {
                     [void][Reflection.assembly]::LoadFrom($DllPath.ToString())
-                    Add-Type -Language CSharp -TypeDefinition $CSharpCode -ReferencedAssemblies ('System.Drawing', $DllPath.ToString()) -ea Stop
+                    Add-Type -Language CSharp -TypeDefinition $CSharpCode -ReferencedAssemblies ('System.Drawing', 'System.Windows.Forms', $DllPath.ToString()) -ea Stop
                 }
             }
             catch {
@@ -822,7 +822,6 @@ class PSWebDriver {
             }
 
             Unregister-Event $this.InstanceId -ea SilentlyContinue
-            Unregister-Event $this.InstanceId
         }
         catch {}
         finally {
