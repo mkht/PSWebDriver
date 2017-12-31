@@ -94,17 +94,20 @@ class PSWebDriver {
     #endregion
 
     #region Hidden properties
+    Hidden [string] $InstanceId
     Hidden [string] $StrictBrowserName
     Hidden [string] $DriverPackage
     Hidden [string] $PSModuleRoot
     Hidden [int] $DefaultImplicitWait = 5
     Hidden [int] $CurrentImplicitWait = 5
     Hidden [System.Timers.Timer]$Timer
+    Hidden [int]$RecordInterval = 5000
     #endregion
 
     #region Constructor:PSWebDriver
     PSWebDriver([string]$Browser) {
         $this.PSModuleRoot = Split-Path $PSScriptRoot -Parent
+        $this.InstanceId = [string]( -join ((1..4) | % {Get-Random -input ([char[]]((48..57) + (65..90) + (97..122)))})) #4-digits random id
         $this.BrowserName = $Browser
         $this.StrictBrowserName = $this._ParseBrowserName($Browser)
         $this.DriverPackage = $this._ParseDriverPackage($Browser)
@@ -675,58 +678,80 @@ class PSWebDriver {
     }
     #endregion Hidden Method
 
-    #region [WIP]recorder
+    #region [Experimental] Animated GIF Recorder
     Hidden [void]_InitRecorder() {
         $this._DisposeRecorder()
 
+        # Load AnimatedGifWrapper class
         $LibPath = Join-Path $this.PSModuleRoot '\Lib'
-        if (!("AnimatedGif" -as [type])) {
-            $local:CSharpCode = gc (Join-Path $LibPath '\AnimatedGif\AnimatedGif.cs') -Raw -ea SilentlyContinue
-            # Load Class
+        if (!("AnimatedGifWrapper" -as [type])) {
+            $local:CSharpCode = gc (Join-Path $LibPath '\AnimatedGifWrapper\AnimatedGifWrapper.cs') -Raw -ea SilentlyContinue
+            $local:DllPath = Resolve-Path "$LibPath\AnimatedGif.*\lib\AnimatedGif.dll" -ea SilentlyContinue
             try {
                 if ($CSharpCode) {
-                    Add-Type -Language CSharp -TypeDefinition $CSharpCode -ReferencedAssemblies ('PresentationCore', 'WindowsBase', 'System.xaml') -ea Stop
+                    [void][Reflection.assembly]::LoadFrom($DllPath.ToString())
+                    Add-Type -Language CSharp -TypeDefinition $CSharpCode -ReferencedAssemblies ('System.Drawing', $DllPath.ToString()) -ea Stop
                 }
             }
             catch {
-                Write-Error "Couldn't load AnimatedGif Class"
+                Write-Error "Couldn't load AnimatedGifWrapper Class"
             }
         }
 
-        if ("AnimatedGif" -as [type]) {
-            $global:Recorder = New-Object AnimatedGif
+        #Create background timer job
+        if ("AnimatedGifWrapper" -as [type]) {
+            try {
+                #Jobから実行できるようにGlobalスコープで作成
+                Set-Variable -Name ('Recorder' + $this.InstanceId) -Value (New-Object AnimatedGifWrapper) -Scope Global #他のインスタンスと被らないよう変数名にIDを付ける
+                Set-Variable -Name ('Counter' + $this.InstanceId) -Value 0 -Scope Global
 
-            if ($this.Driver) {
-                $global:WebDriver = $this.Driver
-            }
+                if ($this.Driver) {
+                    #Jobから実行できるようにWebDriverをGlobalスコープにする
+                    Set-Variable -Name ('WebDriver' + $this.InstanceId) -Value $this.Driver -Scope Global
+                }
 
-            $this.Timer = New-Object System.Timers.Timer
-            $this.Timer.Interval = 5000
+                $this.Timer = New-Object System.Timers.Timer
+                $this.Timer.Interval = $this.RecordInterval #Interval ms
 
-            #forDebug
-            # $global:Logging = @()
-            $Action = {
-                # $ScreenShot
-                if ($global:WebDriver -and $global:Recorder) {
-                    try {
-                        $global:Recorder.AddFrame([byte[]]($global:WebDriver.GetScreenShot().AsByteArray))
-                        #forDebug
-                        # $global:Logging += ("ScreenShot ok:{0}" -f [datetime]::Now.ToString())
+                #forDebug
+                # $global:Logging = @()
+                $Action = {
+                    $Id = [string]$Event.MessageData
+                    $localCounter = [int](Get-Variable -Name ('Counter' + $Id) -ea SilentlyContinue).Value
+                    #停止し忘れやメモリ食いつぶしを防ぐために最大記録回数を制限する
+                    if ($localCounter -gt 1200) {
+                        #500ms*1200=10分想定
+                        #Stop
                     }
-                    catch {
-                        #forDebug
-                        # $global:Logging += ("ScreenShot error:{0}" -f [datetime]::Now.ToString())
+                    else {
+                        Set-Variable -Name ('Counter' + $Id) -Value ($localCounter + 1)
+                        # $global:Logging += ("ID:{0}" -f $Id) #forDebug
+                        if ((Get-Variable ('WebDriver' + $Id) -ea SilentlyContinue) -and (Get-Variable ('Recorder' + $Id) -ea SilentlyContinue)) {
+                            try {
+                                (Get-Variable ('Recorder' + $Id)).Value.AddFrame([byte[]]((Get-Variable ('WebDriver' + $Id)).Value.GetScreenShot().AsByteArray))
+                                #forDebug
+                                # $global:Logging += ("ScreenShot ok:{0}" -f [datetime]::Now.ToString())
+                            }
+                            catch {
+                                #forDebug
+                                # $global:Logging += ("ScreenShot error:{0}" -f $_Exception.Message)
+                            }
+                        }
                     }
                 }
+
+                Register-ObjectEvent -InputObject $this.Timer -EventName Elapsed -SourceIdentifier $this.InstanceId -Action $Action -MessageData $this.InstanceId> $null
             }
-            Register-ObjectEvent -inputObject $this.Timer -eventName Elapsed -sourceIdentifier testEventSample -Action $Action > $null
+            catch {
+                Write-Error 'Failed Initilize GIF Recorder'
+            }
         }
     }
 
     Hidden [void]_DisposeRecorder() {
         if ($this.Timer) {
             try {
-                $this.Timer.Close()
+                $this.Timer.Close() #Stop timer
             }
             catch {}
             finally {
@@ -734,42 +759,73 @@ class PSWebDriver {
             }
         }
 
-        Get-EventSubscriber -SourceIdentifier testEventSample -ea SilentlyContinue | Unregister-Event
+        # Unregister Event subscriber
+        Get-EventSubscriber -SourceIdentifier $this.InstanceId -ea SilentlyContinue | Unregister-Event
 
-        if ($global:Recorder) {
+        # Dispose Recorder
+        if (Get-Variable ('Recorder' + $this.InstanceId) -ea SilentlyContinue) {
             try {
-                $global:Recorder.Dispose()
+                (Get-Variable ('Recorder' + $this.InstanceId)).Value.Dispose()
             }
             catch {}
             finally {
-                $global:Recorder = $null
+                Remove-Variable -Name ('Recorder' + $this.InstanceId) -Scope Global
             }
         }
 
-        if ($global:WebDriver) {
-            $global:WebDriver = $null
+        # Release global scope WebDriver
+        if (Get-Variable ('WebDriver' + $this.InstanceId) -ea SilentlyContinue) {
+            Remove-Variable -Name ('WebDriver' + $this.InstanceId) -Scope Global
         }
     }
 
-    [void]StartRecorder() {
+    [void]StartAnimationRecorder([int]$Interval) {
+        # Minimum interval is 500ms
+        if ($Interval -lt 500) {
+            throw [System.ArgumentOutOfRangeException]::new("You can't specify Interval less than 500ms")
+            return
+        }
+
+        #Chack is recoder already started
+        if (Get-EventSubscriber -SourceIdentifier $this.InstanceId -ea SilentlyContinue) {
+            Write-Error 'Recorder has already started !'
+            return
+        }
+
+        if (!$this.Driver) {
+            $this._WarnBrowserNotStarted()
+            return
+        }
+
+        $this.RecordInterval = $Interval
         $this._InitRecorder()
         if ($this.Timer) {
-            $this.Timer.start()
+            $this.Timer.start() #Start record
         }
     }
 
-    [void]StopRecorder() {
-        if ($this.Timer) {
-            $this.Timer.Stop()
-        }
-
-        # if($global:Recorder){
-        #     $global:Recorder.Save('F:\testA.gif')
-        # }
-        Unregister-Event testEventSample
-        # $this._DisposeRecorder()
+    [void]StartAnimationRecorder() {
+        $this.StartAnimationRecorder(1000)  #default interval 1 sec
     }
 
+    [void]StopAnimationRecorder([string]$FileName) {
+        try {
+            if ($this.Timer) {
+                $this.Timer.Stop()  #Stop recorder
+            }
+
+            # Save Animated GIF file
+            if (Get-Variable ('Recorder' + $this.InstanceId) -ea SilentlyContinue) {
+                (Get-Variable ('Recorder' + $this.InstanceId)).Value.Save($FileName, $this.RecordInterval)
+            }
+
+            Unregister-Event $this.InstanceId
+        }
+        catch {}
+        finally {
+            $this._DisposeRecorder()
+        }
+    }
     #endregion
 
 }
