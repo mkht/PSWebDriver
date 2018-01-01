@@ -809,7 +809,10 @@ class PSWebDriver {
         $this.RecordInterval = $Interval
         $this._InitRecorder()
         if ($this.Timer) {
-            $this.Timer.start() #Start record
+            #First capture
+            (Get-Variable ('Recorder' + $this.InstanceId)).Value.AddFrame([byte[]]((Get-Variable ('WebDriver' + $this.InstanceId)).Value.GetScreenShot().AsByteArray))
+            #Start record
+            $this.Timer.start()
         }
     }
 
