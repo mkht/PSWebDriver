@@ -779,7 +779,7 @@ class PSWebDriver {
         }
     }
 
-    [void]StartAnimationRecorder([int]$Interval) {
+    [void]StartAnimationRecord([int]$Interval) {
         # Minimum interval is 500ms
         if ($Interval -lt 500) {
             throw [System.ArgumentOutOfRangeException]::new("You can't specify Interval less than 500ms")
@@ -804,11 +804,11 @@ class PSWebDriver {
         }
     }
 
-    [void]StartAnimationRecorder() {
-        $this.StartAnimationRecorder(1000)  #default interval 1 sec
+    [void]StartAnimationRecord() {
+        $this.StartAnimationRecord(1000)  #default interval 1 sec
     }
 
-    [void]StopAnimationRecorder([string]$FileName) {
+    [void]StopAnimationRecord([string]$FileName) {
         try {
             if ($this.Timer) {
                 $this.Timer.Stop()  #Stop recorder
@@ -830,8 +830,8 @@ class PSWebDriver {
     }
 
     #Only stop record. Don't save file
-    [void]StopAnimationRecorder() {
-        $this.StopAnimationRecorder($null)
+    [void]StopAnimationRecord() {
+        $this.StopAnimationRecord($null)
     }
     #endregion
 
