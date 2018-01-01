@@ -204,6 +204,14 @@ class PSWebDriver {
 
     #region Method:Quit()
     [void]Quit() {
+        # Stop animation recorder if running
+        if($this.Timer){
+            try{
+                $this._DisposeRecorder()
+            }
+            catch{}
+        }
+
         if ($this.Driver) {
             try {
                 $this.Driver.Quit()
