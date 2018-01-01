@@ -205,11 +205,11 @@ class PSWebDriver {
     #region Method:Quit()
     [void]Quit() {
         # Stop animation recorder if running
-        if($this.Timer){
-            try{
+        if ($this.Timer) {
+            try {
                 $this._DisposeRecorder()
             }
-            catch{}
+            catch {}
         }
 
         if ($this.Driver) {
@@ -752,6 +752,7 @@ class PSWebDriver {
             }
             catch {
                 Write-Error 'Failed Initilize GIF Recorder'
+                $this._DisposeRecorder()    #Dispose recorder when error occured.
             }
         }
     }
