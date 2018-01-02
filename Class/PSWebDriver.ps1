@@ -53,7 +53,7 @@ class Selector {
             '^className=(.+)' { [Selector]::new($Matches[1], [SelectorType]::ClassName) }
             '^link=(.+)' { [Selector]::new($Matches[1], [SelectorType]::Link) }
             '^xpath=(.+)' { [Selector]::new($Matches[1], [SelectorType]::XPath) }
-            '^//.+' { [Selector]::new($Matches[0], [SelectorType]::XPath) }
+            '^/.+' { [Selector]::new($Matches[0], [SelectorType]::XPath) }
             '^css=(.+)' { [Selector]::new($Matches[1], [SelectorType]::Css) }
             Default {[Selector]::new($Expression)}
         }
