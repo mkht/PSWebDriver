@@ -69,7 +69,7 @@ Selenium WebDriverをPowerShellから利用するためのラッパークラス�
 ##### 操作
 |名前|戻り値型|説明|
 ----|----|----
-|SendKeys([string]$Target, [string]$Value)|void|`$Target`(SelectorExpression)で指定される要素に対して`$Value`を入力します|
+|SendKeys([string]$Target, [string]$Value)|void|`$Target`(SelectorExpression)で指定される要素に対して`$Value`を入力します<br>特殊キーの送信については下部の「特殊キーの入力について」を参照してください|
 |ClearAndType([string]$Target, [string]$Value)|void|`$Target`(SelectorExpression)で指定される要素に対して`$Value`を入力します<br>既存の内容をクリアしてから入力する点が`SendKeys()`との違いです<br>(Selenium IDEの`Type`コマンドに相当します)|
 |Click([string]$Target)|void|`$Target`(SelectorExpression)で指定される要素をクリックします|
 |Select([string]$Target, [string]$Value)|void|`$Target`(SelectorExpression)で指定されるSelect要素から`$Value`をテキストに持つ要素を選択します|
@@ -165,6 +165,15 @@ CSSセレクタを使用して要素を特定します。
 検索文字列の前に`exact:`を付けます。  
 例) `exact:***asterisk****`
 
+----
+#### 特殊キーの入力について
+`SendKeys()`や`ClearAndType()`でEnterキーや矢印キーなどの特殊キーを送信する場合は、`${KEY_CODE}`という書式を使用します。
+使用可能なKEY_CODEの一覧は[こちら](/Static/KEYMAP.txt)
+
+例）`SendKeys()`メソッドを使用してABC[Backspace][Enter]と入力する例
+```PowerShell
+$Browser.SendKeys('id=target', 'ABC${KEY_BACKSPACE}${KEY_ENTER}')
+```
 
 ----
 ## ライセンス
