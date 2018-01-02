@@ -87,14 +87,14 @@ class SpecialKeys {
 #region Class:PSWebDriver
 class PSWebDriver {
     #region Public Properties
-    [ValidateSet("Chrome", "Firefox", "Edge", "HeadlessChrome", "IE", "InternetExplorer")]
-    [string]$BrowserName
-    [SpecialKeys]$SpecialKeys
     $Driver
     #endregion
 
     #region Hidden properties
+    [ValidateSet("Chrome", "Firefox", "Edge", "HeadlessChrome", "IE", "InternetExplorer")]
+    Hidden [string] $BrowserName
     Hidden [string] $InstanceId
+    Hidden [SpecialKeys] $SpecialKeys
     Hidden [string] $StrictBrowserName
     Hidden [string] $DriverPackage
     Hidden [string] $PSModuleRoot
