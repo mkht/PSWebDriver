@@ -98,8 +98,7 @@ class PSWebDriver {
     Hidden [string] $StrictBrowserName
     Hidden [string] $DriverPackage
     Hidden [string] $PSModuleRoot
-    Hidden [int] $DefaultImplicitWait = 0
-    Hidden [int] $CurrentImplicitWait = 0
+    Hidden [int] $ImplicitWait = 0
     Hidden [int] $PageLoadTimeout = 30
     Hidden [System.Timers.Timer]$Timer
     Hidden [int]$RecordInterval = 5000
@@ -124,7 +123,7 @@ class PSWebDriver {
             $this._WarnBrowserNotStarted()
         }
         else {
-            [int]$local:tmp = $this.CurrentImplicitWait
+            [int]$local:tmp = $this.ImplicitWait
             try {
                 if ($TimeoutInSeconds -lt 0) {
                     $TimeSpan = [System.Threading.Timeout]::InfiniteTimeSpan
@@ -133,10 +132,10 @@ class PSWebDriver {
                     $TimeSpan = New-TimeSpan -Seconds $TimeoutInSeconds -ea Stop
                 }
                 $this.Driver.Manage().Timeouts().ImplicitWait = $TimeSpan
-                $this.CurrentImplicitWait = $TimeoutInSeconds
+                $this.ImplicitWait = $TimeoutInSeconds
             }
             catch {
-                $this.CurrentImplicitWait = $tmp
+                $this.ImplicitWait = $tmp
             }
         }
     }
@@ -194,7 +193,7 @@ class PSWebDriver {
             $this.Driver = New-Object $tmp($Options)
         }
         #Set default implicit wait
-        if ($this.Driver) {$this.SetImplicitWait($this.DefaultImplicitWait)}
+        if ($this.Driver) {$this.SetImplicitWait($this.ImplicitWait)}
     }
 
     [void]Start([Uri]$URL) {
@@ -299,7 +298,7 @@ class PSWebDriver {
 
     #region Method:IsElementPresent()
     [bool]IsElementPresent([string]$SelectorExpression) {
-        [int]$tmpWait = $this.CurrentImplicitWait
+        [int]$tmpWait = $this.ImplicitWait
         try {
             # Set implicit wait to 0 sec temporally.
             if ($this.Driver) {$this.SetImplicitWait(0)}
@@ -631,7 +630,7 @@ class PSWebDriver {
             return $false
         }
 
-        [int]$tmpWait = $this.CurrentImplicitWait
+        [int]$tmpWait = $this.ImplicitWait
         # Set implicit wait to 0 sec temporally.
         if ($this.Driver) {$this.SetImplicitWait(0)}
 
