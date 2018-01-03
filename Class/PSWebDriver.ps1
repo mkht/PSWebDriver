@@ -275,7 +275,7 @@ class PSWebDriver {
                 'XPath' { iex '[OpenQA.Selenium.By]::XPath($Selector.ToString())' }
                 'Css' { iex '[OpenQA.Selenium.By]::CssSelector($Selector.ToString())'}
                 Default {
-                    Write-Error 'Undefind selector type'
+                    throw 'Undefind selector type'
                     return $null
                 }
             }
@@ -540,27 +540,27 @@ class PSWebDriver {
         $LibPath = Join-Path $this.PSModuleRoot '\Lib'
         if (!("OpenQA.Selenium.By" -as [type])) {
             if (!($SeleniumPath = Resolve-Path "$LibPath\Selenium.WebDriver.*\lib\net40" -ea SilentlyContinue)) {
-                Write-Error "Couldn't find WebDriver.dll"
+                throw "Couldn't find WebDriver.dll"
             }
             # Load Selenium
             try {
                 Add-Type -Path (Join-Path $SeleniumPath 'WebDriver.dll') -ErrorAction Stop
             }
             catch {
-                Write-Error "Couldn't load Selenium WebDriver"
+                throw "Couldn't load Selenium WebDriver"
             }
         }
 
         if (("OpenQA.Selenium.By" -as [type]) -and !("OpenQA.Selenium.Support.UI.SelectElement" -as [type])) {
             if (!($SeleniumPath = Resolve-Path "$LibPath\Selenium.Support.*\lib\net40" -ea SilentlyContinue)) {
-                Write-Error "Couldn't find WebDriver.Support.dll"
+                throw "Couldn't find WebDriver.Support.dll"
             }
             # Load Selenium Support
             try {
                 Add-Type -Path (Join-Path $SeleniumPath 'WebDriver.Support.dll') -ErrorAction Stop
             }
             catch {
-                Write-Error "Couldn't load Selenium Support"
+                throw "Couldn't load Selenium Support"
             }
         }
     }
@@ -584,7 +584,7 @@ class PSWebDriver {
                 }
             }
             else {
-                Write-Error "Couldn't find $exe"
+                throw "Couldn't find $exe"
             }
         }
     }
@@ -646,7 +646,7 @@ class PSWebDriver {
             catch {$ret = $false}
             if ($sec -ge $Timeout) {
                 $ret = $false
-                Write-Error 'Timeout'
+                throw 'Timeout'
                 break
             }
             [System.Threading.Thread]::Sleep(1000)
@@ -699,7 +699,7 @@ class PSWebDriver {
                 }
             }
             catch {
-                Write-Error "Couldn't load AnimatedGifWrapper Class"
+                throw "Couldn't load AnimatedGifWrapper Class"
             }
         }
 
@@ -748,7 +748,7 @@ class PSWebDriver {
                 Register-ObjectEvent -InputObject $this.Timer -EventName Elapsed -SourceIdentifier $this.InstanceId -Action $Action -MessageData $this.InstanceId> $null
             }
             catch {
-                Write-Error 'Failed Initilize GIF Recorder'
+                throw 'Failed Initilize GIF Recorder'
                 $this._DisposeRecorder()    #Dispose recorder when error occured.
             }
         }
@@ -794,7 +794,7 @@ class PSWebDriver {
 
         #Chack is recoder already started
         if (Get-EventSubscriber -SourceIdentifier $this.InstanceId -ea SilentlyContinue) {
-            Write-Error 'Recorder has already started !'
+            throw 'Recorder has already started !'
             return
         }
 
