@@ -98,8 +98,8 @@ class PSWebDriver {
     Hidden [string] $StrictBrowserName
     Hidden [string] $DriverPackage
     Hidden [string] $PSModuleRoot
-    Hidden [int] $DefaultImplicitWait = 5
-    Hidden [int] $CurrentImplicitWait = 5
+    Hidden [int] $DefaultImplicitWait = 0
+    Hidden [int] $CurrentImplicitWait = 0
     Hidden [System.Timers.Timer]$Timer
     Hidden [int]$RecordInterval = 5000
     #endregion
