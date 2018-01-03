@@ -100,6 +100,7 @@ class PSWebDriver {
     Hidden [string] $PSModuleRoot
     Hidden [int] $DefaultImplicitWait = 0
     Hidden [int] $CurrentImplicitWait = 0
+    Hidden [int] $PageLoadTimeout = 30
     Hidden [System.Timers.Timer]$Timer
     Hidden [int]$RecordInterval = 5000
     #endregion
@@ -315,7 +316,7 @@ class PSWebDriver {
 
     #region Method:Sendkeys() & ClearAndType()
     [void]SendKeys([string]$Target, [string]$Value) {
-        $this.WaitForPageToLoad($this.CurrentImplicitWait)
+        $this.WaitForPageToLoad($this.PageLoadTimeout)
         $element = try {$this.FindElement($Target)}catch {$null}
         if ($element) {
             if (($Value -match '\$\{(KEY_.+)\}') -and ($this.SpecialKeys)) {
@@ -327,7 +328,7 @@ class PSWebDriver {
     }
 
     [void]ClearAndType([string]$Target, [string]$Value) {
-        $this.WaitForPageToLoad($this.CurrentImplicitWait)
+        $this.WaitForPageToLoad($this.PageLoadTimeout)
         $element = try {$this.FindElement($Target)}catch {$null}
         if ($element) {
             $element.Clear()
@@ -342,7 +343,7 @@ class PSWebDriver {
 
     #region Method:Click()
     [void]Click([string]$Target) {
-        $this.WaitForPageToLoad($this.CurrentImplicitWait)
+        $this.WaitForPageToLoad($this.PageLoadTimeout)
         $element = try {$this.FindElement($Target)}catch {$null}
         if ($element) {
             $element.Click()
@@ -356,7 +357,7 @@ class PSWebDriver {
             $this._WarnBrowserNotStarted()
         }
         else {
-            $this.WaitForPageToLoad($this.CurrentImplicitWait)
+            $this.WaitForPageToLoad($this.PageLoadTimeout)
             $element = try {$this.FindElement($Target)}catch {$null}
             if ($element) {
                 $SelectElement = $null
