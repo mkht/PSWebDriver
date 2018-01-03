@@ -840,6 +840,15 @@ class PSWebDriver {
     }
     #endregion
 
+    #region Assertion
+    [void]AssertTitle([string]$Value){
+        $this.GetTitle() | Assert -Expected $value
+    }
+
+    [void]AssertNotTitle([string]$Value){
+        $this.GetTitle() | Assert -Not -Expected $value
+    }
+    #endregion
 }
 #endregion
 
