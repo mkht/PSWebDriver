@@ -51,7 +51,7 @@ PowerShellVersion = '5.0'
 # ProcessorArchitecture = ''
 
 # このモジュールをインポートする前にグローバル環境にインポートされている必要があるモジュール
-# RequiredModules = @()
+RequiredModules = @(@{ModuleName='Pester'; ModuleVersion='4.1.0'; })
 
 # このモジュールをインポートする前に読み込まれている必要があるアセンブリ
 # RequiredAssemblies = @()
