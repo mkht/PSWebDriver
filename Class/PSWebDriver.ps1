@@ -316,8 +316,7 @@ class PSWebDriver {
 
     #region Method:Sendkeys() & ClearAndType()
     [void]SendKeys([string]$Target, [string]$Value) {
-        $element = try {$this.FindElement($Target)}catch {$null}
-        if ($element) {
+        if ($element = $this.FindElement($Target)) {
             if (($Value -match '\$\{(KEY_.+)\}') -and ($this.SpecialKeys)) {
                 $Spec = $this.SpecialKeys.ConvertSeleniumKeys($Matches[1])
                 $Value = ($Value -replace '\$\{KEY_.+\}', $Spec)
@@ -327,8 +326,7 @@ class PSWebDriver {
     }
 
     [void]ClearAndType([string]$Target, [string]$Value) {
-        $element = try {$this.FindElement($Target)}catch {$null}
-        if ($element) {
+        if ($element = $this.FindElement($Target)) {
             $element.Clear()
             if (($Value -match '\$\{(KEY_.+)\}') -and ($this.SpecialKeys)) {
                 $Spec = $this.SpecialKeys.ConvertSeleniumKeys($Matches[1])
@@ -341,8 +339,7 @@ class PSWebDriver {
 
     #region Method:Click()
     [void]Click([string]$Target) {
-        $element = try {$this.FindElement($Target)}catch {$null}
-        if ($element) {
+        if ($element = $this.FindElement($Target)) {
             $element.Click()
         }
     }
@@ -354,8 +351,7 @@ class PSWebDriver {
             $this._WarnBrowserNotStarted()
         }
         else {
-            $element = try {$this.FindElement($Target)}catch {$null}
-            if ($element) {
+            if ($element = $this.FindElement($Target)) {
                 $SelectElement = $null
                 iex '$SelectElement = New-Object "OpenQA.Selenium.Support.UI.SelectElement" $element' -ea Stop
                 #TODO: Implement SelectByIndex
@@ -509,7 +505,7 @@ class PSWebDriver {
             $this._WarnBrowserNotStarted()
             return $null
         }
-        if ($element = try {$this.FindElement($Target)}catch {$null}) {
+        if ($element = $this.FindElement($Target)) {
             return [string]($this.Driver.ExecuteScript($Script, $element))
         }
         else {
