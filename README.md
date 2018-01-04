@@ -55,7 +55,7 @@ Selenium WebDriverをPowerShellから利用するためのラッパークラス�
 ----|----|----
 |SetImplicitWait([int]$TimeoutInSeconds)|void|要素検索やページ読込時の暗黙的な待機時間(秒)を指定します|
 |GetWindowSize()|System.Drawing.Size|ブラウザのウィンドウサイズを取得します|
-|SetWindowSize([System.Drawing.Size]$Size)|System.Drawing.Size|ブラウザのウィンドウサイズを変更します|
+|SetWindowSize([System.Drawing.Size]$Size)|void|ブラウザのウィンドウサイズを変更します|
 |SetWindowSize([int]$Width,[int]$Height)|void|ブラウザのウィンドウサイズを変更します|
 
 ##### 要素検索 / 情報取得
