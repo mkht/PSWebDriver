@@ -258,7 +258,7 @@ class PSWebDriver {
     }
     #endregion
 
-    [string]GetAttribute([string]$Target, [string]$Attribute){
+    [string]GetAttribute([string]$Target, [string]$Attribute) {
         return [string]($this.FindElement($Target).GetAttribute($Attribute))
     }
 
