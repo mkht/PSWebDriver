@@ -262,6 +262,10 @@ class PSWebDriver {
         return [string]($this.FindElement($Target).GetAttribute($Attribute))
     }
 
+    [string]GetText([string]$Target) {
+        return [string]($this.FindElement($Target).Text)
+    }
+
     #region Method:FindElement()
     [Object]FindElement([Selector]$Selector) {
         if (!$this.Driver) {
