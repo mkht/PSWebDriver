@@ -924,6 +924,16 @@ class PSWebDriver {
         $this.AssertNotAttribute($Target, 'value', $Value)
     }
 
+    [void]AssertText([string]$Target, [string]$Value) {
+        $Pattern = $this._PerseSeleniumPattern($Value)
+        $this.GetText($Target) | Assert -Expected $Pattern.Pattern -Matcher $Pattern.Matcher
+    }
+
+    [void]AssertNotText([string]$Target, [string]$Value) {
+        $Pattern = $this._PerseSeleniumPattern($Value)
+        $this.GetText($Target) | Assert -Not -Expected $Pattern.Pattern -Matcher $Pattern.Matcher
+    }
+
     [void]AssertVisible([string]$Target) {
         $this.IsVisible($Target) | Assert -Expected $true
     }
