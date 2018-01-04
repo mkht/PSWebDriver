@@ -437,73 +437,71 @@ class PSWebDriver {
     #region WaitFor*
     #region Method:WaitForPageToLoad()
     [bool]WaitForPageToLoad([int]$Timeout) {
-        $sb = [ScriptBlock] {[string]($this.ExecuteScript('return document.readyState;')) -eq 'complete'}
+        $sb = [ScriptBlock] {
+            if (!($this.ExecuteScript('return document.readyState;') -eq 'complete')) {
+                throw Exception
+            }
+        }
         return $this._WaitForBase($sb, $Timeout)
     }
     #endregion
 
     #region Method:WaitForElementPresent()
     [bool]WaitForElementPresent([string]$Target, [int]$Timeout) {
-        $sb = [ScriptBlock] {$this.IsElementPresent($Target)}
+        $sb = [ScriptBlock] {$this.AssertElementPresent($Target)}
         return $this._WaitForBase($sb, $Timeout)
     }
 
     [bool]WaitForElementNotPresent([string]$Target, [int]$Timeout) {
-        $sb = [ScriptBlock] {!$this.IsElementPresent($Target)}
+        $sb = [ScriptBlock] {$this.AssertElementNotPresent($Target)}
         return $this._WaitForBase($sb, $Timeout)
     }
     #endregion
 
     #region Method:WaitForValue()
     [bool]WaitForValue([string]$Target, [string]$Value, [int]$Timeout) {
-        $sb = [ScriptBlock] {[string]($this.FindElement($Target).GetAttribute('value')) -like $Value}
-        $sb = $this._ConvertSeleniumPattern($sb, $Value)
+        $sb = [ScriptBlock] {$this.AssertValue($Target, $Value)}
         return $this._WaitForBase($sb, $Timeout)
     }
 
     [bool]WaitForNotValue([string]$Target, [string]$Value, [int]$Timeout) {
-        $sb = [ScriptBlock] {[string]($this.FindElement($Target).GetAttribute('value')) -notlike $Value}
-        $sb = $this._ConvertSeleniumPattern($sb, $Value)
+        $sb = [ScriptBlock] {$this.AssertNotValue($Target, $Value)}
         return $this._WaitForBase($sb, $Timeout)
     }
     #endregion
 
     #region Method:WaitForText()
     [bool]WaitForText([string]$Target, [string]$Value, [int]$Timeout) {
-        $sb = [ScriptBlock] {[string]($this.FindElement($Target).Text) -like $Value}
-        $sb = $this._ConvertSeleniumPattern($sb, $Value)
+        $sb = [ScriptBlock] {$this.AssertText($Target, $Value)}
         return $this._WaitForBase($sb, $Timeout)
     }
 
     [bool]WaitForNotText([string]$Target, [string]$Value, [int]$Timeout) {
-        $sb = [ScriptBlock] {[string]($this.FindElement($Target).Text) -notlike $Value}
-        $sb = $this._ConvertSeleniumPattern($sb, $Value)
+        $sb = [ScriptBlock] {$this.AssertNotText($Target, $Value)}
         return $this._WaitForBase($sb, $Timeout)
     }
     #endregion
 
     #region Method:WaitForVisible()
     [bool]WaitForVisible([string]$Target, [int]$Timeout) {
-        $sb = [ScriptBlock] {($this.FindElement($Target).Displayed)}
+        $sb = [ScriptBlock] {$this.AssertVisible($Target, $Value)}
         return $this._WaitForBase($sb, $Timeout)
     }
 
     [bool]WaitForNotVisible([string]$Target, [int]$Timeout) {
-        $sb = [ScriptBlock] {!($this.FindElement($Target).Displayed)}
+        $sb = [ScriptBlock] {$this.AssertNotVisible($Target, $Value)}
         return $this._WaitForBase($sb, $Timeout)
     }
     #endregion
 
     #region Method:WaitForTitle()
     [bool]WaitForTitle([string]$Value, [int]$Timeout) {
-        $sb = [ScriptBlock] {[string]($this.GetTitle()) -like $Value}
-        $sb = $this._ConvertSeleniumPattern($sb, $Value)
+        $sb = [ScriptBlock] {$this.AssertTitle($Value)}
         return $this._WaitForBase($sb, $Timeout)
     }
 
     [bool]WaitForNotTitle([string]$Value, [int]$Timeout) {
-        $sb = [ScriptBlock] {[string]($this.GetTitle()) -notlike $Value}
-        $sb = $this._ConvertSeleniumPattern($sb, $Value)
+        $sb = [ScriptBlock] {$this.AssertNotTitle($Value)}
         return $this._WaitForBase($sb, $Timeout)
     }
     #endregion
@@ -658,12 +656,13 @@ class PSWebDriver {
         [bool]$ret = $false
         do {
             try {
-                if ($Expression.Invoke()) {
-                    $ret = $true
-                    break
-                }
+                $Expression.Invoke()
+                $ret = $true
+                break
             }
-            catch {$ret = $false}
+            catch {
+                $ret = $false
+            }
             if ($sec -ge $Timeout) {
                 $ret = $false
                 throw 'Timeout'
@@ -675,31 +674,6 @@ class PSWebDriver {
 
         if ($this.Driver) {$this.SetImplicitWait($tmpWait)}
         return $ret
-    }
-
-    # Selenium IDEの検索パターン文字列をPowershell比較演算子に置き換える
-    Hidden [scriptblock]_ConvertSeleniumPattern([scriptblock]$ScriptBlock, [string]$Pattern) {
-        # 入力する$ScriptBlockのフォーマット制限がきつい。比較対象の変数名は必ず$Value
-        # 比較演算子は-likeもしくは-notlikeでなければ正しく動作しない
-        $sbstr = $ScriptBlock.ToString()
-        switch -Regex ($Pattern) {
-            '^regexp:(.+)' {
-                $sbstr = $sbstr -replace '-(|not)like', '-$1match'
-                $sbstr = $sbstr.Replace('$Value', ("'{0}'" -f $Matches[1]))
-            }
-            '^glob:(.+)' {
-                $sbstr = $sbstr.Replace('$Value', ("'{0}'" -f $Matches[1]))
-            }
-            '^exact:(.+)' {
-                $sbstr = $sbstr.Replace('-like', '-eq')
-                $sbstr = $sbstr.Replace('-notlike', '-ne')
-                $sbstr = $sbstr.Replace('$Value', ("'{0}'" -f $Matches[1]))
-            }
-            Default {
-                return $ScriptBlock
-            }
-        }
-        return [scriptblock]::Create($sbstr)
     }
 
     Hidden [HashTable]_PerseSeleniumPattern([string]$Pattern) {
