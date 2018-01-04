@@ -258,6 +258,30 @@ class PSWebDriver {
     }
     #endregion
 
+    #region Method:GetLocation()
+    [string]GetLocation() {
+        if (!$this.Driver) {
+            $this._WarnBrowserNotStarted()
+            return $null
+        }
+        else {
+            return [string]$this.Driver.Url
+        }
+    }
+    #endregion
+
+    [string]GetAttribute([string]$Target, [string]$Attribute) {
+        return [string]($this.FindElement($Target).GetAttribute($Attribute))
+    }
+
+    [string]GetText([string]$Target) {
+        return [string]($this.FindElement($Target).Text)
+    }
+
+    [bool]IsVisible([string]$Target) {
+        return [bool]($this.FindElement($Target).Displayed)
+    }
+
     #region Method:FindElement()
     [Object]FindElement([Selector]$Selector) {
         if (!$this.Driver) {
@@ -413,73 +437,71 @@ class PSWebDriver {
     #region WaitFor*
     #region Method:WaitForPageToLoad()
     [bool]WaitForPageToLoad([int]$Timeout) {
-        $sb = [ScriptBlock] {[string]($this.ExecuteScript('return document.readyState;')) -eq 'complete'}
+        $sb = [ScriptBlock] {
+            if (!($this.ExecuteScript('return document.readyState;') -eq 'complete')) {
+                throw Exception
+            }
+        }
         return $this._WaitForBase($sb, $Timeout)
     }
     #endregion
 
     #region Method:WaitForElementPresent()
     [bool]WaitForElementPresent([string]$Target, [int]$Timeout) {
-        $sb = [ScriptBlock] {$this.IsElementPresent($Target)}
+        $sb = [ScriptBlock] {$this.AssertElementPresent($Target)}
         return $this._WaitForBase($sb, $Timeout)
     }
 
     [bool]WaitForElementNotPresent([string]$Target, [int]$Timeout) {
-        $sb = [ScriptBlock] {!$this.IsElementPresent($Target)}
+        $sb = [ScriptBlock] {$this.AssertElementNotPresent($Target)}
         return $this._WaitForBase($sb, $Timeout)
     }
     #endregion
 
     #region Method:WaitForValue()
     [bool]WaitForValue([string]$Target, [string]$Value, [int]$Timeout) {
-        $sb = [ScriptBlock] {[string]($this.FindElement($Target).GetAttribute('value')) -like $Value}
-        $sb = $this._ConvertSeleniumPattern($sb, $Value)
+        $sb = [ScriptBlock] {$this.AssertValue($Target, $Value)}
         return $this._WaitForBase($sb, $Timeout)
     }
 
     [bool]WaitForNotValue([string]$Target, [string]$Value, [int]$Timeout) {
-        $sb = [ScriptBlock] {[string]($this.FindElement($Target).GetAttribute('value')) -notlike $Value}
-        $sb = $this._ConvertSeleniumPattern($sb, $Value)
+        $sb = [ScriptBlock] {$this.AssertNotValue($Target, $Value)}
         return $this._WaitForBase($sb, $Timeout)
     }
     #endregion
 
     #region Method:WaitForText()
     [bool]WaitForText([string]$Target, [string]$Value, [int]$Timeout) {
-        $sb = [ScriptBlock] {[string]($this.FindElement($Target).Text) -like $Value}
-        $sb = $this._ConvertSeleniumPattern($sb, $Value)
+        $sb = [ScriptBlock] {$this.AssertText($Target, $Value)}
         return $this._WaitForBase($sb, $Timeout)
     }
 
     [bool]WaitForNotText([string]$Target, [string]$Value, [int]$Timeout) {
-        $sb = [ScriptBlock] {[string]($this.FindElement($Target).Text) -notlike $Value}
-        $sb = $this._ConvertSeleniumPattern($sb, $Value)
+        $sb = [ScriptBlock] {$this.AssertNotText($Target, $Value)}
         return $this._WaitForBase($sb, $Timeout)
     }
     #endregion
 
     #region Method:WaitForVisible()
     [bool]WaitForVisible([string]$Target, [int]$Timeout) {
-        $sb = [ScriptBlock] {($this.FindElement($Target).Displayed)}
+        $sb = [ScriptBlock] {$this.AssertVisible($Target, $Value)}
         return $this._WaitForBase($sb, $Timeout)
     }
 
     [bool]WaitForNotVisible([string]$Target, [int]$Timeout) {
-        $sb = [ScriptBlock] {!($this.FindElement($Target).Displayed)}
+        $sb = [ScriptBlock] {$this.AssertNotVisible($Target, $Value)}
         return $this._WaitForBase($sb, $Timeout)
     }
     #endregion
 
     #region Method:WaitForTitle()
     [bool]WaitForTitle([string]$Value, [int]$Timeout) {
-        $sb = [ScriptBlock] {[string]($this.GetTitle()) -like $Value}
-        $sb = $this._ConvertSeleniumPattern($sb, $Value)
+        $sb = [ScriptBlock] {$this.AssertTitle($Value)}
         return $this._WaitForBase($sb, $Timeout)
     }
 
     [bool]WaitForNotTitle([string]$Value, [int]$Timeout) {
-        $sb = [ScriptBlock] {[string]($this.GetTitle()) -notlike $Value}
-        $sb = $this._ConvertSeleniumPattern($sb, $Value)
+        $sb = [ScriptBlock] {$this.AssertNotTitle($Value)}
         return $this._WaitForBase($sb, $Timeout)
     }
     #endregion
@@ -634,12 +656,13 @@ class PSWebDriver {
         [bool]$ret = $false
         do {
             try {
-                if ($Expression.Invoke()) {
-                    $ret = $true
-                    break
-                }
+                $Expression.Invoke()
+                $ret = $true
+                break
             }
-            catch {$ret = $false}
+            catch {
+                $ret = $false
+            }
             if ($sec -ge $Timeout) {
                 $ret = $false
                 throw 'Timeout'
@@ -653,29 +676,31 @@ class PSWebDriver {
         return $ret
     }
 
-    # Selenium IDEの検索パターン文字列をPowershell比較演算子に置き換える
-    Hidden [scriptblock]_ConvertSeleniumPattern([scriptblock]$ScriptBlock, [string]$Pattern) {
-        # 入力する$ScriptBlockのフォーマット制限がきつい。比較対象の変数名は必ず$Value
-        # 比較演算子は-likeもしくは-notlikeでなければ正しく動作しない
-        $sbstr = $ScriptBlock.ToString()
+    Hidden [HashTable]_PerseSeleniumPattern([string]$Pattern) {
+        $local:ret = [HashTable]@{
+            Matcher = ''
+            Pattern = ''
+        }
+
         switch -Regex ($Pattern) {
             '^regexp:(.+)' {
-                $sbstr = $sbstr -replace '-(|not)like', '-$1match'
-                $sbstr = $sbstr.Replace('$Value', ("'{0}'" -f $Matches[1]))
+                $ret.Matcher = 'RegExp'
+                $ret.Pattern = $Matches[1]
             }
             '^glob:(.+)' {
-                $sbstr = $sbstr.Replace('$Value', ("'{0}'" -f $Matches[1]))
+                $ret.Matcher = 'Like'
+                $ret.Pattern = $Matches[1]
             }
             '^exact:(.+)' {
-                $sbstr = $sbstr.Replace('-like', '-eq')
-                $sbstr = $sbstr.Replace('-notlike', '-ne')
-                $sbstr = $sbstr.Replace('$Value', ("'{0}'" -f $Matches[1]))
+                $ret.Matcher = 'Equal'
+                $ret.Pattern = $Matches[1]
             }
             Default {
-                return $ScriptBlock
+                $ret.Matcher = 'Like'
+                $ret.Pattern = $Pattern
             }
         }
-        return [scriptblock]::Create($sbstr)
+        return $ret
     }
     #endregion Hidden Method
 
@@ -840,6 +865,79 @@ class PSWebDriver {
     }
     #endregion
 
+    #region Assertion
+    [void]AssertElementPresent([string]$Selector) {
+        $this.IsElementPresent($Selector) | Assert -Expected $true
+    }
+
+    [void]AssertElementNotPresent([string]$Selector) {
+        $this.IsElementPresent($Selector) | Assert -Expected $false
+    }
+
+    [void]AssertAlertPresent() {
+        $this.IsAlertPresent() | Assert -Expected $true
+    }
+
+    [void]AssertAlertNotPresent() {
+        $this.IsAlertPresent() | Assert -Expected $false
+    }
+
+    [void]AssertTitle([string]$Value) {
+        $Pattern = $this._PerseSeleniumPattern($Value)
+        $this.GetTitle() | Assert -Expected $Pattern.Pattern -Matcher $Pattern.Matcher
+    }
+
+    [void]AssertNotTitle([string]$Value) {
+        $Pattern = $this._PerseSeleniumPattern($Value)
+        $this.GetTitle() | Assert -Not -Expected $Pattern.Pattern -Matcher $Pattern.Matcher
+    }
+
+    [void]AssertLocation([string]$Value) {
+        $Pattern = $this._PerseSeleniumPattern($Value)
+        $this.GetLocation() | Assert -Expected $Pattern.Pattern -Matcher $Pattern.Matcher
+    }
+
+    [void]AssertNotLocation([string]$Value) {
+        $Pattern = $this._PerseSeleniumPattern($Value)
+        $this.GetLocation() | Assert -Not -Expected $Pattern.Pattern -Matcher $Pattern.Matcher
+    }
+
+    [void]AssertAttribute([string]$Target, [string]$Attribute, [string]$Value) {
+        $Pattern = $this._PerseSeleniumPattern($Value)
+        $this.GetAttribute($Target, $Attribute) | Assert -Expected $Pattern.Pattern -Matcher $Pattern.Matcher
+    }
+
+    [void]AssertNotAttribute([string]$Target, [string]$Attribute, [string]$Value) {
+        $Pattern = $this._PerseSeleniumPattern($Value)
+        $this.GetAttribute($Target, $Attribute) | Assert -Not -Expected $Pattern.Pattern -Matcher $Pattern.Matcher
+    }
+
+    [void]AssertValue([string]$Target, [string]$Value) {
+        $this.AssertAttribute($Target, 'value', $Value)
+    }
+
+    [void]AssertNotValue([string]$Target, [string]$Value) {
+        $this.AssertNotAttribute($Target, 'value', $Value)
+    }
+
+    [void]AssertText([string]$Target, [string]$Value) {
+        $Pattern = $this._PerseSeleniumPattern($Value)
+        $this.GetText($Target) | Assert -Expected $Pattern.Pattern -Matcher $Pattern.Matcher
+    }
+
+    [void]AssertNotText([string]$Target, [string]$Value) {
+        $Pattern = $this._PerseSeleniumPattern($Value)
+        $this.GetText($Target) | Assert -Not -Expected $Pattern.Pattern -Matcher $Pattern.Matcher
+    }
+
+    [void]AssertVisible([string]$Target) {
+        $this.IsVisible($Target) | Assert -Expected $true
+    }
+
+    [void]AssertNotVisible([string]$Target) {
+        $this.IsVisible($Target) | Assert -Expected $false
+    }
+    #endregion
 }
 #endregion
 

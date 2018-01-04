@@ -58,6 +58,7 @@ PowerShellVersion = '5.0'
 
 # このモジュールをインポートする前に呼び出し元の環境で実行されるスクリプト ファイル (.ps1)。
 ScriptsToProcess = @(
+    'Function\Assert.ps1'
     'Script\init.ps1'
     'Class\PSWebDriver.ps1'
 )
