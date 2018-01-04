@@ -266,6 +266,10 @@ class PSWebDriver {
         return [string]($this.FindElement($Target).Text)
     }
 
+    [bool]IsVisible([string]$Target) {
+        return [bool]($this.FindElement($Target).Displayed)
+    }
+
     #region Method:FindElement()
     [Object]FindElement([Selector]$Selector) {
         if (!$this.Driver) {
@@ -918,6 +922,14 @@ class PSWebDriver {
 
     [void]AssertNotValue([string]$Target, [string]$Value) {
         $this.AssertNotAttribute($Target, 'value', $Value)
+    }
+
+    [void]AssertVisible([string]$Target) {
+        $this.IsVisible($Target) | Assert -Expected $true
+    }
+
+    [void]AssertNotVisible([string]$Target) {
+        $this.IsVisible($Target) | Assert -Expected $false
     }
     #endregion
 }
