@@ -258,6 +258,18 @@ class PSWebDriver {
     }
     #endregion
 
+    #region Method:GetLocation()
+    [string]GetLocation() {
+        if (!$this.Driver) {
+            $this._WarnBrowserNotStarted()
+            return $null
+        }
+        else {
+            return [string]$this.Driver.Url
+        }
+    }
+    #endregion
+
     [string]GetAttribute([string]$Target, [string]$Attribute) {
         return [string]($this.FindElement($Target).GetAttribute($Attribute))
     }
@@ -904,6 +916,16 @@ class PSWebDriver {
     [void]AssertNotTitle([string]$Value) {
         $Pattern = $this._PerseSeleniumPattern($Value)
         $this.GetTitle() | Assert -Not -Expected $Pattern.Pattern -Matcher $Pattern.Matcher
+    }
+
+    [void]AssertLocation([string]$Value) {
+        $Pattern = $this._PerseSeleniumPattern($Value)
+        $this.GetLocation() | Assert -Expected $Pattern.Pattern -Matcher $Pattern.Matcher
+    }
+
+    [void]AssertNotLocation([string]$Value) {
+        $Pattern = $this._PerseSeleniumPattern($Value)
+        $this.GetLocation() | Assert -Not -Expected $Pattern.Pattern -Matcher $Pattern.Matcher
     }
 
     [void]AssertAttribute([string]$Target, [string]$Attribute, [string]$Value) {
