@@ -874,11 +874,11 @@ class PSWebDriver {
         $this.IsElementPresent($Selector) | Assert -Expected $false
     }
 
-    [void]assertAlertPresent() {
+    [void]AssertAlertPresent() {
         $this.IsAlertPresent() | Assert -Expected $true
     }
 
-    [void]assertAlertNotPresent() {
+    [void]AssertAlertNotPresent() {
         $this.IsAlertPresent() | Assert -Expected $false
     }
 
