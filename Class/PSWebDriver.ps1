@@ -677,6 +677,33 @@ class PSWebDriver {
         }
         return [scriptblock]::Create($sbstr)
     }
+
+    Hidden [HashTable]_PerseSeleniumPattern([string]$Pattern) {
+        $local:ret = [HashTable]@{
+            Matcher = ''
+            Pattern = ''
+        }
+
+        switch -Regex ($Pattern) {
+            '^regexp:(.+)' {
+                $ret.Matcher = 'RegExp'
+                $ret.Pattern = $Matches[1]
+            }
+            '^glob:(.+)' {
+                $ret.Matcher = 'Like'
+                $ret.Pattern = $Matches[1]
+            }
+            '^exact:(.+)' {
+                $ret.Matcher = 'Equal'
+                $ret.Pattern = $Matches[1]
+            }
+            Default {
+                $ret.Matcher = 'Like'
+                $ret.Pattern = $Pattern
+            }
+        }
+        return $ret
+    }
     #endregion Hidden Method
 
     #region [Experimental] Animated GIF Recorder
@@ -841,12 +868,30 @@ class PSWebDriver {
     #endregion
 
     #region Assertion
-    [void]AssertTitle([string]$Value){
-        $this.GetTitle() | Assert -Expected $value
+    [void]AssertElementPresent([string]$Selector) {
+        $this.IsElementPresent($Selector) | Assert -Expected $true
     }
 
-    [void]AssertNotTitle([string]$Value){
-        $this.GetTitle() | Assert -Not -Expected $value
+    [void]AssertElementNotPresent([string]$Selector) {
+        $this.IsElementPresent($Selector) | Assert -Expected $false
+    }
+
+    [void]assertAlertPresent() {
+        $this.IsAlertPresent() | Assert -Expected $true
+    }
+
+    [void]assertAlertNotPresent() {
+        $this.IsAlertPresent() | Assert -Expected $false
+    }
+
+    [void]AssertTitle([string]$Value) {
+        $Pattern = $this._PerseSeleniumPattern($Value)
+        $this.GetTitle() | Assert -Expected $Pattern.Pattern -Matcher $Pattern.Matcher
+    }
+
+    [void]AssertNotTitle([string]$Value) {
+        $Pattern = $this._PerseSeleniumPattern($Value)
+        $this.GetTitle() | Assert -Not -Expected $Pattern.Pattern -Matcher $Pattern.Matcher
     }
     #endregion
 }
