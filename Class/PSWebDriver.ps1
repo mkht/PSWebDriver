@@ -897,6 +897,24 @@ class PSWebDriver {
         $Pattern = $this._PerseSeleniumPattern($Value)
         $this.GetTitle() | Assert -Not -Expected $Pattern.Pattern -Matcher $Pattern.Matcher
     }
+
+    [void]AssertAttribute([string]$Target, [string]$Attribute, [string]$Value) {
+        $Pattern = $this._PerseSeleniumPattern($Value)
+        $this.GetAttribute($Target, $Attribute) | Assert -Expected $Pattern.Pattern -Matcher $Pattern.Matcher
+    }
+
+    [void]AssertNotAttribute([string]$Target, [string]$Attribute, [string]$Value) {
+        $Pattern = $this._PerseSeleniumPattern($Value)
+        $this.GetAttribute($Target, $Attribute) | Assert -Not -Expected $Pattern.Pattern -Matcher $Pattern.Matcher
+    }
+
+    [void]AssertValue([string]$Target, [string]$Value) {
+        $this.AssertAttribute($Target, 'value', $Value)
+    }
+
+    [void]AssertNotValue([string]$Target, [string]$Value) {
+        $this.AssertNotAttribute($Target, 'value', $Value)
+    }
     #endregion
 }
 #endregion
