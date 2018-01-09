@@ -386,6 +386,36 @@ class PSWebDriver {
     }
     #endregion
 
+    #region HTTP Status Code (Invoke-WebRequest)
+    [int]GetHttpStatusCode([Uri]$URL){
+        try{
+            $response = Invoke-WebRequest -Uri $URL -UseBasicParsing -ErrorAction Stop
+        }
+        catch{
+            $response = $_.Exception.Response
+            if(!$response){
+                throw $_.Exception
+            }
+        }
+
+        if($response.StatusCode -as [int]){
+            return [int]$response.StatusCode
+        }
+        else{
+            throw [System.Exception]::new('Unexpected Exception')
+        }
+    }
+
+    # Assertion
+    [void]AssertHttpStatusCode([Uri]$URL, [int]$Value){
+        $this.GetHttpStatusCode($URL) | Assert -Expected $Value
+    }
+
+    [void]AssertNotHttpStatusCode([Uri]$URL, [int]$Value){
+        $this.GetHttpStatusCode($URL) | Assert -Not -Expected $Value
+    }
+    #endregion
+
     #region Alert handling
     #region Method:IsAlertPresent()
     [bool]IsAlertPresent() {
