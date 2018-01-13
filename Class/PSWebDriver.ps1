@@ -258,7 +258,7 @@ class PSWebDriver {
     }
     #endregion
 
-    #region Method:GetLocation()
+    #region Method:Get/SetLocation()
     [string]GetLocation() {
         if (!$this.Driver) {
             $this._WarnBrowserNotStarted()
@@ -267,6 +267,11 @@ class PSWebDriver {
         else {
             return [string]$this.Driver.Url
         }
+    }
+
+    # Aliase of Open()
+    [void]SetLocation([Uri]$URL) {
+        $this.Open($URL)
     }
     #endregion
 
