@@ -212,7 +212,10 @@ class PSWebDriver {
             catch {}
         }
 
-        if ($this.Driver) {
+        if (!$this.Driver) {
+            $this._WarnBrowserNotStarted()
+        }
+        else {
             try {
                 $this.Driver.Quit()
                 Write-Verbose 'Browser terminated successfully.'
@@ -224,9 +227,6 @@ class PSWebDriver {
                 $this.Driver = $null
             }
         }
-        else {
-            $this._WarnBrowserNotStarted()
-        }
     }
 
     # Aliase of Quit()
@@ -237,11 +237,11 @@ class PSWebDriver {
 
     #region Method:Open()
     [void]Open([Uri]$URL) {
-        if ($this.Driver) {
-            $this.Driver.Navigate().GoToUrl($URL)
+        if (!$this.Driver) {
+            $this._WarnBrowserNotStarted()
         }
         else {
-            $this._WarnBrowserNotStarted()
+            $this.Driver.Navigate().GoToUrl($URL)
         }
     }
     #endregion
@@ -387,31 +387,31 @@ class PSWebDriver {
     #endregion
 
     #region HTTP Status Code (Invoke-WebRequest)
-    [int]GetHttpStatusCode([Uri]$URL){
-        try{
+    [int]GetHttpStatusCode([Uri]$URL) {
+        try {
             $response = Invoke-WebRequest -Uri $URL -UseBasicParsing -ErrorAction Stop
         }
-        catch{
+        catch {
             $response = $_.Exception.Response
-            if(!$response){
+            if (!$response) {
                 throw $_.Exception
             }
         }
 
-        if($response.StatusCode -as [int]){
+        if ($response.StatusCode -as [int]) {
             return [int]$response.StatusCode
         }
-        else{
+        else {
             throw [System.Exception]::new('Unexpected Exception')
         }
     }
 
     # Assertion
-    [void]AssertHttpStatusCode([Uri]$URL, [int]$Value){
+    [void]AssertHttpStatusCode([Uri]$URL, [int]$Value) {
         $this.GetHttpStatusCode($URL) | Assert -Expected $Value
     }
 
-    [void]AssertNotHttpStatusCode([Uri]$URL, [int]$Value){
+    [void]AssertNotHttpStatusCode([Uri]$URL, [int]$Value) {
         $this.GetHttpStatusCode($URL) | Assert -Not -Expected $Value
     }
     #endregion
