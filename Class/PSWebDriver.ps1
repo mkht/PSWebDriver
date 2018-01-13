@@ -456,6 +456,18 @@ class PSWebDriver {
     }
     #endregion
 
+    #region Method:SelectFrame()
+    [void]SelectFrame([string]$Name) {
+        if (!$this.Driver) {
+            $this._WarnBrowserNotStarted()
+        }
+        else {
+            $this.Driver.SwitchTo().DefaultContent()
+            $this.Driver.SwitchTo().Frame($Name)
+        }
+    }
+    #endregion
+
     #region HTTP Status Code (Invoke-WebRequest)
     [int]GetHttpStatusCode([Uri]$URL) {
         try {
