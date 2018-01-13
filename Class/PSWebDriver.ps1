@@ -228,10 +228,22 @@ class PSWebDriver {
             }
         }
     }
+    #endregion
 
-    # Aliase of Quit()
+    #region Method:Close()
     [void]Close() {
-        $this.Quit()
+        if (!$this.Driver) {
+            $this.Quit()
+        }
+        elseif ($this.Driver.WindowHandles.Count -le 1) {
+            $this.Quit()
+        }
+        else {
+            $this.Driver.Close()
+            if (!$this.Driver.WindowHandles) {
+                $this.Quit()
+            }
+        }
     }
     #endregion
 
