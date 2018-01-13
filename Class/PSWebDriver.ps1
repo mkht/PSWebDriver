@@ -519,12 +519,12 @@ class PSWebDriver {
 
     #region Method:WaitForVisible()
     [bool]WaitForVisible([string]$Target, [int]$Timeout) {
-        $sb = [ScriptBlock] {$this.AssertVisible($Target, $Value)}
+        $sb = [ScriptBlock] {$this.AssertVisible($Target)}
         return $this._WaitForBase($sb, $Timeout)
     }
 
     [bool]WaitForNotVisible([string]$Target, [int]$Timeout) {
-        $sb = [ScriptBlock] {$this.AssertNotVisible($Target, $Value)}
+        $sb = [ScriptBlock] {$this.AssertNotVisible($Target)}
         return $this._WaitForBase($sb, $Timeout)
     }
     #endregion
