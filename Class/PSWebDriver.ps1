@@ -469,7 +469,7 @@ class PSWebDriver {
     [bool]WaitForPageToLoad([int]$Timeout) {
         $sb = [ScriptBlock] {
             if (!($this.ExecuteScript('return document.readyState;') -eq 'complete')) {
-                throw Exception
+                throw [System.Exception]::new()
             }
         }
         return $this._WaitForBase($sb, $Timeout)
