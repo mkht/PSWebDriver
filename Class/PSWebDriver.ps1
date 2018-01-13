@@ -391,6 +391,59 @@ class PSWebDriver {
     }
     #endregion
 
+    #region Switch window
+    [void]SelectWindow([string]$Title) {
+        if (!$this.Driver) {
+            $this._WarnBrowserNotStarted()
+        }
+        else {
+            $FoundFlag = $false
+            $Pattern = $this._PerseSeleniumPattern($Title)
+            $CurrentWindow = $this.Driver.CurrentWindowHandle
+            $AllWindow = $this.Driver.WindowHandles
+            #Enumerate all windows
+            :SWLOOP foreach ($window in $AllWindow) {
+                if ($window -eq $CurrentWindow) {
+                    $title = $this.Driver.Title
+                }
+                else {
+                    $title = $this.Driver.SwitchTo().Window($window).Title
+                }
+
+                switch ($Pattern.Matcher) {
+                    'Like' {
+                        if ($title -like $Pattern.Pattern) {
+                            $FoundFlag = $true
+                            break SWLOOP
+                        }
+                    }
+                    'RegExp' {
+                        if ($title -match $Pattern.Pattern) {
+                            $FoundFlag = $true
+                            break SWLOOP
+                        }
+                    }
+                    'Equal' {
+                        if ($title -eq $Pattern.Pattern) {
+                            $FoundFlag = $true
+                            break SWLOOP
+                        }
+                    }
+                }
+            }
+
+            if (!$FoundFlag) {
+                if ($this.Driver.CurrentWindowHandle -ne $CurrentWindow) {
+                    #Retrun current window
+                    $this.Driver.SwitchTo().Window($CurrentWindow)
+                }
+                #throw NoSuchWindowException
+                $this.Driver.SwitchTo().Window([System.Guid]::NewGuid().ToString)
+            }
+        }
+    }
+    #endregion
+
     #region HTTP Status Code (Invoke-WebRequest)
     [int]GetHttpStatusCode([Uri]$URL) {
         try {
