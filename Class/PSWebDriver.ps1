@@ -78,7 +78,7 @@ class SpecialKeys {
             return [string](iex '[OpenQA.Selenium.keys]::($tmp)')
         }
         else {
-            return ''
+            return ('${{{0}}}' -f $key)
         }
     }
 }
@@ -358,11 +358,13 @@ class PSWebDriver {
     #region Method:Sendkeys() & ClearAndType()
     [void]SendKeys([string]$Target, [string]$Value) {
         if ($element = $this.FindElement($Target)) {
-            if (($Value -match '\$\{(KEY_.+)\}') -and ($this.SpecialKeys)) {
-                $Spec = $this.SpecialKeys.ConvertSeleniumKeys($Matches[1])
-                $Value = ($Value -replace '\$\{KEY_.+\}', $Spec)
+            $Ret = $Value
+            $local:regex = [regex]'\$\{KEY_.+?\}'
+            $regex.Matches($Value) | % {
+                $Spec = $this.SpecialKeys.ConvertSeleniumKeys(($_.Value).SubString(2, ($_.Value.length - 3)))
+                $Ret = $Ret.Replace($_.Value, $Spec)
             }
-            $element.SendKeys($Value)
+            $element.SendKeys($Ret)
         }
     }
 
