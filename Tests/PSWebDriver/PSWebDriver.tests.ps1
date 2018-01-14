@@ -81,6 +81,14 @@ Describe 'Tests for PSWebDriver class' {
         }
     }
 
+    Context 'Click()' {
+        It 'Click button element' {
+            $Driver.Click('id=btnClearOutput')
+            $Driver.Click('id=btn1')
+            $Driver.GetText('id=output') | Should -Be 'Button1 Clicked!'
+        }
+    }
+
     Context 'SendKeys()' {
         BeforeEach {
             $Driver.Click('id=reset')
@@ -114,6 +122,33 @@ Describe 'Tests for PSWebDriver class' {
         It 'Input complex string with multiple special keys "H+${KEY_}llo${KEY_N7}${KEY_N7}@.comA${KEY_BKSP}", Expect "H+${KEY_}llo77@.com"' {
             $Driver.SendKeys('name=first_name', 'H+${KEY_}llo${KEY_N7}${KEY_N7}@.comA${KEY_BKSP}')
             $Driver.GetAttribute('name=first_name', 'value') | Should -Be 'H+${KEY_}llo77@.com'
+        }
+    }
+
+    Context 'ClearAndType()' {
+        BeforeEach {
+            $Driver.Click('id=reset')
+        }
+
+        It 'Input "ABC" to textbox that has already text' {
+            $Driver.ClearAndType('name=last_name', 'ABC')
+            $Driver.GetAttribute('name=last_name', 'value') | Should -Be 'ABC'
+        }
+    }
+
+    Context 'Select() & GetSelectedLabel()' {
+        BeforeEach {
+            $Driver.Click('id=reset')
+        }
+
+        It 'Select drop down' {
+            $Driver.Select('name=blood', 'Type-O')
+            $Driver.GetSelectedLabel('name=blood') | Should -Be 'Type-O'
+        }
+
+        It 'Throw exception when target element is not [select]' {
+            {$Driver.Select('id=btn1', 'Type-AB')} | Should -Throw "Element should have been select but was input"
+            {$Driver.GetSelectedLabel('id=btn1')} | Should -Throw "Element should have been select but was input"
         }
     }
 
