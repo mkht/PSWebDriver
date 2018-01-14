@@ -1,4 +1,4 @@
-#Require -Version 5.0
+﻿#Require -Version 5.0
 using namespace OpenQA.Selenium
 
 #region Enum:ImageFormat
@@ -295,6 +295,10 @@ class PSWebDriver {
         return [string]($this.FindElement($Target).Text)
     }
 
+    [string]GetSelectedLabel([string]$Target) {
+        return [string]($this._GetSelectElement($Target).SelectedOption.Text)
+    }
+
     [bool]IsVisible([string]$Target) {
         return [bool]($this.FindElement($Target).Displayed)
     }
@@ -391,11 +395,11 @@ class PSWebDriver {
     #region Method:Select()
     [void]Select([string]$Target, [string]$Value) {
         if ($SelectElement = $this._GetSelectElement($Target)) {
-                #TODO: Implement SelectByIndex
-                #TODO: Implement SelectByValue
-                $SelectElement.SelectByText($Value)
-            }
+            #TODO: Implement SelectByIndex
+            #TODO: Implement SelectByValue
+            $SelectElement.SelectByText($Value)
         }
+    }
     #endregion
 
     #region Switch window
