@@ -1,4 +1,4 @@
-﻿#Require -Version 5.0
+#Require -Version 5.0
 using namespace OpenQA.Selenium
 
 #region Enum:ImageFormat
@@ -390,19 +390,12 @@ class PSWebDriver {
 
     #region Method:Select()
     [void]Select([string]$Target, [string]$Value) {
-        if (!$this.Driver) {
-            $this._WarnBrowserNotStarted()
-        }
-        else {
-            if ($element = $this.FindElement($Target)) {
-                $SelectElement = $null
-                iex '$SelectElement = New-Object "OpenQA.Selenium.Support.UI.SelectElement" $element' -ea Stop
+        if ($SelectElement = $this._GetSelectElement($Target)) {
                 #TODO: Implement SelectByIndex
                 #TODO: Implement SelectByValue
                 $SelectElement.SelectByText($Value)
             }
         }
-    }
     #endregion
 
     #region Switch window
@@ -815,6 +808,17 @@ class PSWebDriver {
             }
         }
         return $ret
+    }
+
+    Hidden [Object]_GetSelectElement([string]$Target) {
+        if ($element = $this.FindElement($Target)) {
+            $SelectElement = $null
+            iex '$SelectElement = New-Object "OpenQA.Selenium.Support.UI.SelectElement" $element' -ea Stop
+            return $SelectElement
+        }
+        else {
+            return $null
+        }
     }
     #endregion Hidden Method
 
