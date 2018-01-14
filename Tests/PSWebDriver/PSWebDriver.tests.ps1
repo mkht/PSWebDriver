@@ -130,7 +130,7 @@ Describe 'Tests for PSWebDriver class' {
             $Driver.Click('id=reset')
         }
 
-        It 'Input "ABC" to textbox that has already text' {
+        It 'Input "ABC" to textbox that has text already' {
             $Driver.ClearAndType('name=last_name', 'ABC')
             $Driver.GetAttribute('name=last_name', 'value') | Should -Be 'ABC'
         }
