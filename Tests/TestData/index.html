@@ -1,0 +1,91 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>Test page for PSWebDriver</title>
+  <script type="text/javascript">
+    function output(resultText){
+      document.getElementById('output').childNodes[0].nodeValue=resultText;
+    }
+
+    function show_confirm(){
+      var confirmation=confirm("Chose an option.");
+      if (confirmation==true){
+        output("Confirmed.");
+      }
+      else{
+        output("Rejected!");
+      }
+    }
+
+    function show_alert(){
+      alert("This is Alert!");
+      output("Alert is gone.");
+    }
+    function show_prompt(){
+      var response = prompt("What's the best web QA tool?","Selenium");
+      output(response);
+    }
+    function open_window(windowName){
+      window.open("newWindow.html",windowName);
+    }
+    </script>
+</head>
+<body>
+  <h1>Test page for PSWebDriver</h1>
+
+  <div name='Text'>
+      <h2>Text</h2>
+        <p id="normal_text" class="normal_class">This is normal text.</p>
+        <p><a href="https://www.google.com/">Link to Google</a></p>
+        <p><a href="javascript:void(0);" onclick="output('Link Text Clicked!');">Link Text</a></p>
+    </div>
+
+  <div name='Buttons'>
+  <h2>Buttons</h2>
+  <p>
+  <input type="button" id="btn1" onclick="output('Button1 Clicked!')" value="Button1" />
+  <input type="button" id="btn2" onclick="output('Button2 Clicked!')" value="Button2 (Disabled)" disabled />
+  </p>
+  <p>
+  <input type="button" id="btnConfirm" onclick="show_confirm()" value="Show confirm box" />
+  <input type="button" id="btnAlert" onclick="show_alert()" value="Show alert" />
+  <input type="button" id="btnPrompt" onclick="show_prompt()" value="Show prompt" />
+  <input type="button" id="btnNewWindow" onclick="open_window('NewWindow')" value="Open New Window" />
+  </p>
+</div>
+
+<div name='Form'>
+    <h2>Form</h2>
+    <p>
+      <form id="TestForm1" action="#">
+          <p><label>Normal Input: <input type="text" name="first_name"></label></p>
+          <p><label>Typed Input: <input type="text" name="last_name" value="Text"></label></p>
+          <p><label>Password: <input type="password" name="password"></label></p>
+          <p><label>Hidden: <input type="hidden" name="hidden" value="12345"></label></p>
+          <p><label>Select:
+          <select name="blood">
+          <option value="A">Type-A</option>
+          <option value="B">Type-B</option>
+          <option value="O">Type-O</option>
+          <option value="AB">Type-AB</option>
+          </select>
+          </label></p>
+          <p><label>Radio:
+            <input type="radio" name="sex" value="male">Man
+          <input type="radio" name="sex" value="female">Women
+        </label></p>
+        <p><label>CheckBox:
+            <input type="checkbox" name="hobby" value="sports">Sports
+          <input type="checkbox" name="hobby" value="music">Music
+          <input type="checkbox" name="hobby" value="travel">Travel
+        </label></p>
+          <p><input id="Send" type="submit" value="Send"> <input id="reset" type="reset" value="Reset"></p>
+  </form>
+  </p>
+  </div>
+
+  <br />
+  <span id="output">
+  </span>
+</body>
+</html>
