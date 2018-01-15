@@ -176,6 +176,26 @@ Describe 'Tests for PSWebDriver class' {
         }
     }
 
+    #TODO: Add test for SelectFrame()
+
+    Context 'GetHttpStatusCode()' {
+        It 'Return Http Status 404' {
+            #Emulate 404 using Mock is difficult...
+            #TODO: Remove outside service dependency
+            $Driver.GetHttpStatusCode('http://ozuma.sakura.ne.jp/httpstatus/404') | Should -Be 404
+        }
+
+        It 'Return Http Status 200' {
+            Mock Invoke-WebRequest { return @{StatusCode = 200}}
+            $Driver.GetHttpStatusCode('http://localhost/200') | Should -Be 200
+        }
+
+        It 'Throw Unexpected error when status code as not [int]' {
+            Mock Invoke-WebRequest { return @{StatusCode = 'NOINT'}}
+            {$Driver.GetHttpStatusCode('http://localhost/200')} | Should -Throw 'Unexpected Exception'
+        }
+    }
+
     if ($Driver) {
         $Driver.Quit()
         $Driver = $null
