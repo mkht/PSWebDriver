@@ -152,6 +152,30 @@ Describe 'Tests for PSWebDriver class' {
         }
     }
 
+    Context 'SelectWindow()' {
+        It 'Open and switch to new window, test page title' {
+            $Driver.Click('id=btnNewWindow')
+            $Driver.SelectWindow('New Window')
+            $Driver.GetTitle() | Should -Be 'New Window'
+        }
+
+        It 'When target window not found, Stay current and throw NoSuchWindowException' {
+            $Current = $Driver.GetTitle()
+            {$Driver.SelectWindow('non existence window')} | Should -Throw 'no such window'
+            $Driver.GetTitle() | Should -Be $Current
+        }
+
+        AfterAll {
+            # Close and return to original window
+            if ($Driver.GetTitle() -ne 'Test page for PSWebDriver') {
+                if ($Driver.Driver.WindowHandles -gt 1) {
+                    $Driver.Close()
+                    $Driver.SelectWindow('Test page for PSWebDriver')
+                }
+            }
+        }
+    }
+
     if ($Driver) {
         $Driver.Quit()
         $Driver = $null
