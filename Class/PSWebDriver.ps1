@@ -538,7 +538,7 @@ class PSWebDriver {
     }
     #endregion
 
-    #region Method:CloseAlertAndGetText()
+    #region Method:CloseAlert()
     [void]CloseAlert() {
         [void]$this.CloseAlertAndGetText($true)
     }
