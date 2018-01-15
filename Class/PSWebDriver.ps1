@@ -253,7 +253,7 @@ class PSWebDriver {
             $this._WarnBrowserNotStarted()
         }
         else {
-            $this.CloseAlertAndGetText($false) > $null
+            $this.CloseAlert($false)
             $this.Driver.Navigate().GoToUrl($URL)
         }
     }
@@ -540,8 +540,12 @@ class PSWebDriver {
     #endregion
 
     #region Method:CloseAlert()
+    [void]CloseAlert([bool]$Accept) {
+        [void]$this.CloseAlertAndGetText($Accept)
+    }
+
     [void]CloseAlert() {
-        [void]$this.CloseAlertAndGetText($true)
+        [void]$this.CloseAlert($true)
     }
     #endregion
     #endregion Alert handling
