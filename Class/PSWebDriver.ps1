@@ -638,18 +638,18 @@ class PSWebDriver {
         return [string]($this.Driver.ExecuteScript($Script))
     }
 
-    [string]ExecuteScript([string]$Target, [string]$Script) {
-        if (!$this.Driver) {
-            $this._WarnBrowserNotStarted()
-            return $null
-        }
-        if ($element = $this.FindElement($Target)) {
-            return [string]($this.Driver.ExecuteScript($Script, $element))
-        }
-        else {
-            return $null
-        }
-    }
+    # [string]ExecuteScript([string]$Target, [string]$Script) {
+    #     if (!$this.Driver) {
+    #         $this._WarnBrowserNotStarted()
+    #         return $null
+    #     }
+    #     if ($element = $this.FindElement($Target)) {
+    #         return [string]($this.Driver.ExecuteScript($Script, $element))
+    #     }
+    #     else {
+    #         return $null
+    #     }
+    # }
     #endregion
 
     #region Method:SaveScreenShot()
