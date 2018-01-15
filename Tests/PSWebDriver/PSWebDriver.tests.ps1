@@ -196,6 +196,82 @@ Describe 'Tests for PSWebDriver class' {
         }
     }
 
+    Context 'IsAlertPresent()' {
+        BeforeEach {
+            $Driver.CloseAlert()
+        }
+
+        It 'Return $true when alert present' {
+            $Driver.Click('id=btnAlert')
+            $Driver.IsAlertPresent() | Should -Be $true
+        }
+
+        It 'Return $false when alert not present' {
+            $Driver.IsAlertPresent() | Should -Be $false
+        }
+
+        It 'Return $true when confirm present' {
+            $Driver.Click('id=btnConfirm')
+            $Driver.IsAlertPresent() | Should -Be $true
+        }
+
+        It 'Return $true when prompt present' {
+            $Driver.Click('id=btnPrompt')
+            $Driver.IsAlertPresent() | Should -Be $true
+        }
+    }
+
+    Context 'CloseAlert() & CloseAlertAndGetText()' {
+        BeforeEach {
+            $Driver.CloseAlert()
+        }
+
+        It 'Close alert' {
+            $Driver.Click('id=btnAlert')
+            $Driver.IsAlertPresent() | Should -Be $true
+            $Driver.CloseAlert()
+            $Driver.IsAlertPresent() | Should -Be $false
+        }
+
+        It 'Get alert text & close' {
+            $Driver.Click('id=btnAlert')
+            $Driver.IsAlertPresent() | Should -Be $true
+            $Driver.CloseAlertAndGetText($true) | Should -Be 'This is Alert!'
+            $Driver.IsAlertPresent() | Should -Be $false
+        }
+
+        It 'Get confirm text & Accept confirm' {
+            $Driver.Click('id=btnConfirm')
+            $Driver.IsAlertPresent() | Should -Be $true
+            $Driver.CloseAlertAndGetText($true) | Should -Be 'Chose an option.'
+            $Driver.IsAlertPresent() | Should -Be $false
+            $Driver.GetText('id=output') | Should -Be 'Confirmed.'
+        }
+
+        It 'Get confirm text & Dismiss confirm' {
+            $Driver.Click('id=btnConfirm')
+            $Driver.IsAlertPresent() | Should -Be $true
+            $Driver.CloseAlertAndGetText($false) | Should -Be 'Chose an option.'
+            $Driver.IsAlertPresent() | Should -Be $false
+            $Driver.GetText('id=output') | Should -Be 'Rejected!'
+        }
+    }
+
+    Context 'ExecuteScript()' {
+        BeforeAll {
+            $Driver.Open($TestData)
+        }
+
+        It 'Execute Javascript' {
+            $Driver.ExecuteScript('output("Execute Code 1");')
+            $Driver.GetText('id=output') | Should -Be 'Execute Code 1'
+        }
+
+        It 'Execute Javascript and get result' {
+            $Driver.ExecuteScript('return document.title;') | Should -Be 'Test page for PSWebDriver'
+        }
+    }
+
     if ($Driver) {
         $Driver.Quit()
         $Driver = $null
