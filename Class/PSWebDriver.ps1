@@ -253,6 +253,7 @@ class PSWebDriver {
             $this._WarnBrowserNotStarted()
         }
         else {
+            $this.CloseAlertAndGetText($false) > $null
             $this.Driver.Navigate().GoToUrl($URL)
         }
     }
