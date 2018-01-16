@@ -630,26 +630,32 @@ class PSWebDriver {
     #endregion
 
     #region Method:ExecuteScript()
-    [string]ExecuteScript([string]$Script) {
+    [Object]ExecuteScript([string]$Script) {
+        return $this.ExecuteScript($Script, $null)
+    }
+
+    [Object]ExecuteScript([string]$Script, [Object[]]$Arguments) {
+        $Object = $null
         if (!$this.Driver) {
             $this._WarnBrowserNotStarted()
             return $null
         }
-        return [string]($this.Driver.ExecuteScript($Script))
-    }
+        if ($Arguments) {
+            $Object = $this.Driver.ExecuteScript($Script, $Arguments)
+        }
+        else {
+            $Object = $this.Driver.ExecuteScript($Script)
+        }
 
-    # [string]ExecuteScript([string]$Target, [string]$Script) {
-    #     if (!$this.Driver) {
-    #         $this._WarnBrowserNotStarted()
-    #         return $null
-    #     }
-    #     if ($element = $this.FindElement($Target)) {
-    #         return [string]($this.Driver.ExecuteScript($Script, $element))
-    #     }
-    #     else {
-    #         return $null
-    #     }
-    # }
+        # Selenium ExecuteScript() seems that return [Array] as [ReadOnlyCollection<T>].
+        # For ease of handling, convert to [System.Array]
+        if ($Object -and ($Object.GetType().Name -match 'ReadOnlyCollection')) {
+            return [Object[]]$Object
+        }
+        else {
+            return $Object
+        }
+    }
     #endregion
 
     #region Method:SaveScreenShot()

@@ -267,8 +267,36 @@ Describe 'Tests for PSWebDriver class' {
             $Driver.GetText('id=output') | Should -Be 'Execute Code 1'
         }
 
-        It 'Execute Javascript and get result' {
-            $Driver.ExecuteScript('return document.title;') | Should -Be 'Test page for PSWebDriver'
+        It 'Execute Javascript and get result as [String]' {
+            $Obj = $Driver.ExecuteScript('return document.title;')
+            $Obj | Should -Be 'Test page for PSWebDriver'
+            $Obj | Should -BeOfType [string]
+        }
+
+        It 'Execute Javascript and get result as [IWebElement]' {
+            $Driver.ExecuteScript('return document.getElementById("normal_text");') | Should -BeOfType 'OpenQA.Selenium.IWebElement'
+        }
+
+        It 'Execute Javascript and get result as [int64]' {
+            $Obj = $Driver.ExecuteScript('return 1;')
+            $Obj | Should -Be 1
+            $Obj | Should -BeOfType [int64]
+        }
+
+        It 'Execute Javascript and get result as [bool]' {
+            $Obj = $Driver.ExecuteScript('return true;')
+            $Obj | Should -Be $true
+            $Obj | Should -BeOfType [bool]
+        }
+
+        It 'Execute Javascript and get result as [Array]' {
+            $Obj = $Driver.ExecuteScript("return ['a', 'b', 123];")
+            $Obj | Should -Be @('a', 'b', 123)
+            $Obj.GetType().FullName | Should -Be 'System.Object[]'
+        }
+
+        It 'Execute Javascript with args' {
+            $Driver.ExecuteScript('return arguments[0] + arguments[1];', [string[]]('Apple', 'Banana')) | Should -Be 'AppleBanana'
         }
     }
 
