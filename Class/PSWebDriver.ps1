@@ -175,7 +175,7 @@ class PSWebDriver {
         $Options = $null
         # for Headless Chrome
         if ($this.BrowserName -eq 'HeadlessChrome') {
-            $Options = New-Object Chrome.ChromeOptions
+            $Options = New-Object OpenQA.Selenium.Chrome.ChromeOptions
             $Options.AddArgument("--headless")
         }
 
