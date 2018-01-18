@@ -112,6 +112,22 @@ class PSWebDriver {
         $this.StrictBrowserName = $this._ParseBrowserName($Browser)
         $this.DriverPackage = $this._ParseDriverPackage($Browser)
         $this.SpecialKeys = [SpecialKeys]::New()
+
+        # Add accessor properties
+        $this | Add-Member ScriptProperty 'Location' {
+            # getter
+            if (!$this.Driver) {
+                $null
+            }
+            else {
+                [string]$this.Driver.Url
+            }
+        } {
+            # setter
+            param ( $arg )
+            $this.Open($arg)
+        }
+
         $this._LoadSelenium()
         $this._LoadWebDriver()
     }
@@ -278,13 +294,13 @@ class PSWebDriver {
             return $null
         }
         else {
-            return [string]$this.Driver.Url
+            return [string]$this.Location
         }
     }
 
     # Aliase of Open()
     [void]SetLocation([Uri]$URL) {
-        $this.Open($URL)
+        $this.Location = $URL
     }
     #endregion
 
