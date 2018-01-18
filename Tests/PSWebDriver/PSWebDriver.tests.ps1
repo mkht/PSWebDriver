@@ -59,9 +59,41 @@ Describe 'Tests for PSWebDriver class' {
         }
     }
 
-    Context 'GetAttribute()' {
-        It 'Get class attribute of the element [id="normal_text"] Expect "normal_class"' {
-            $Driver.GetAttribute('id=normal_text', 'class') | Should -Be 'normal_class'
+    Context 'Location' {
+        BeforeEach {
+            $Driver.Open($TestData)
+        }
+
+        Context 'Get Location property' {
+            It 'Return current url' {
+                $Driver.Location | Should -Be ([Uri]$TestData).AbsoluteUri
+            }
+        }
+
+        Context 'Set Location property' {
+            It 'Move to url' {
+                $NewPage = Join-Path $moduleRoot '\Tests\TestData\newwindow.html'
+                $Driver.Location = [Uri]$NewPage
+                $Driver.Location | Should -Be ([Uri]$NewPage).AbsoluteUri
+            }
+        }
+
+        Context 'GetLocation()' {
+            It 'Return current url' {
+                $Driver.GetLocation() | Should -Be ([Uri]$TestData).AbsoluteUri
+            }
+        }
+
+        Context 'SetLocation()' {
+            It 'Move to url' {
+                $NewPage = Join-Path $moduleRoot '\Tests\TestData\newwindow.html'
+                $Driver.SetLocation($NewPage)
+                $Driver.GetLocation() | Should -Be ([Uri]$NewPage).AbsoluteUri
+            }
+        }
+
+        AfterAll {
+            $Driver.Open($TestData)
         }
     }
 
