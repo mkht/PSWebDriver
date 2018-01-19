@@ -208,7 +208,30 @@ Describe 'Tests for PSWebDriver class' {
         }
     }
 
-    #TODO: Add test for SelectFrame()
+    Context 'SelectFrame()' {
+        BeforeAll {
+            $FramePage = Join-Path $moduleRoot '\Tests\TestData\frame.html'
+            $Driver.Open($FramePage)
+        }
+
+        It 'Select left frame then get text' {
+            $Driver.SelectFrame('leftFrame')
+            $Driver.GetText('id=left-text') | Should -Be 'This is left frame.'
+        }
+
+        It 'Select right frame then get text' {
+            $Driver.SelectFrame('rightFrame')
+            $Driver.GetText('id=right-text') | Should -Be 'This is right frame.'
+        }
+
+        It 'Select non present frame then throw exception' {
+            {$Driver.SelectFrame('notexist')} | Should -Throw 'No frame element found'
+        }
+
+        AfterAll {
+            $Driver.Open($TestData)
+        }
+    }
 
     Context 'GetHttpStatusCode()' {
         It 'Return Http Status 404' {

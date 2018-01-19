@@ -1,0 +1,19 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>Left frame</title>
+  <script type="text/javascript">
+    function output(resultText){
+      document.getElementById('output').childNodes[0].nodeValue=resultText;
+    }
+    </script>
+</head>
+<body>
+  <h1>Left frame</h1>
+  <p id="left-text">This is left frame.</p>
+  <input type="button" id="left-button" onclick="output('Left Button Clicked!')" value="Left Button" />
+  <br /><br /><br />
+  <span id="output">
+  </span>
+</body>
+</html>

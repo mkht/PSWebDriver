@@ -1,0 +1,19 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>Right frame</title>
+  <script type="text/javascript">
+    function output(resultText){
+      document.getElementById('output').childNodes[0].nodeValue=resultText;
+    }
+    </script>
+</head>
+<body>
+  <h1>Right frame</h1>
+  <p id="right-text">This is right frame.</p>
+  <input type="button" id="right-button" onclick="output('Right Button Clicked!')" value="Right Button" />
+  <br /><br /><br />
+  <span id="output">
+  </span>
+</body>
+</html>
