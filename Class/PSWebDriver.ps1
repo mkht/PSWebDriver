@@ -407,6 +407,15 @@ class PSWebDriver {
             $element.Click()
         }
     }
+
+    # Invoke JavaScript click() method
+    # Sometimes Selenium Click is not working with IE11 in Windows 10.
+    # https://github.com/SeleniumHQ/selenium/issues/4292
+    [void]JavaScriptClick([string]$Target) {
+        if ($element = $this.FindElement($Target)) {
+            $this.Driver.ExecuteScript('arguments[0].click();', $element)
+        }
+    }
     #endregion
 
     #region Method:Select()
