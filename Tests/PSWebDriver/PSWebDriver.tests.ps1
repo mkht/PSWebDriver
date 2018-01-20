@@ -121,6 +121,18 @@ Describe 'Tests for PSWebDriver class' {
         }
     }
 
+    Context 'JavaScriptClick()' {
+        BeforeEach {
+            $Driver.Click('id=btnClearOutput')
+        }
+
+        It 'Click button element' {
+            $Driver.GetText('id=output') | Should -Be ''
+            $Driver.JavaScriptClick('id=btn1')
+            $Driver.GetText('id=output') | Should -Be 'Button1 Clicked!'
+        }
+    }
+
     Context 'SendKeys()' {
         BeforeEach {
             $Driver.Click('id=reset')
