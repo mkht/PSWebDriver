@@ -358,6 +358,44 @@ class PSWebDriver {
     }
     #endregion
 
+    #region Method:FindElements()
+    [Object[]]FindElements([Selector]$Selector) {
+        if (!$this.Driver) {
+            $this._WarnBrowserNotStarted()
+            return $null
+        }
+        else {
+            $local:SelectorObj =
+            switch ($Selector.Type) {
+                'Id' { iex '[OpenQA.Selenium.By]::Id($Selector.ToString())' }
+                'Name' { iex '[OpenQA.Selenium.By]::Name($Selector.ToString())'}
+                'Tag' { iex '[OpenQA.Selenium.By]::TagName($Selector.ToString())' }
+                'ClassName' { iex '[OpenQA.Selenium.By]::ClassName($Selector.ToString())'}
+                'Link' { iex '[OpenQA.Selenium.By]::LinkText($Selector.ToString())' }
+                'XPath' { iex '[OpenQA.Selenium.By]::XPath($Selector.ToString())' }
+                'Css' { iex '[OpenQA.Selenium.By]::CssSelector($Selector.ToString())'}
+                Default {
+                    throw 'Undefind selector type'
+                    return $null
+                }
+            }
+            if ($SelectorObj) {
+                $this.WaitForPageToLoad($this.PageLoadTimeout)
+                return $this.Driver.FindElements($SelectorObj)
+            }
+            return $null
+        }
+    }
+
+    [Object[]]FindElements([string]$SelectorExpression) {
+        return $this.FindElements([Selector]::Parse($SelectorExpression))
+    }
+
+    [Object[]]FindElements([string]$SelectorExpression, [SelectorType]$Type) {
+        return $this.FindElements([Selector]::New($SelectorExpression, $Type))
+    }
+    #endregion
+
     #region Method:IsElementPresent()
     [bool]IsElementPresent([string]$SelectorExpression) {
         [int]$tmpWait = $this.ImplicitWait

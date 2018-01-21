@@ -43,6 +43,16 @@ Describe 'Tests for PSWebDriver class' {
         }
     }
 
+    Context 'FindElements()' {
+        It 'Return All WebElements when multiple elements found' {
+            ($Driver.FindElements('name=hobby')).Count | Should -Be 3
+        }
+
+        It 'Return empty array when element not found' {
+            ($Driver.FindElements('name=notexist')).Count | Should -Be 0
+        }
+    }
+
     Context 'IsElementPresent()' {
         It 'Return $true when element found' {
             $Driver.IsElementPresent('id=btn1') | Should -Be $true
