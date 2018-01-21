@@ -143,6 +143,22 @@ Describe 'Tests for PSWebDriver class' {
         }
     }
 
+    Context 'DoubleClick()' {
+        It 'Double click button element' {
+            $Driver.Click('id=btnClearOutput')
+            $Driver.DoubleClick('id=btn3')
+            $Driver.GetText('id=output') | Should -Be 'Button3 Double Clicked!'
+        }
+    }
+
+    Context 'RightClick()' {
+        It 'Right click button element' {
+            $Driver.Click('id=btnClearOutput')
+            $Driver.RightClick('id=btn1')
+            $Driver.GetText('id=output') | Should -Be 'Button1 Right Clicked!'
+        }
+    }
+
     Context 'SendKeys()' {
         BeforeEach {
             $Driver.Click('id=reset')

@@ -38,13 +38,14 @@
         <p id="normal_text" class="normal_class">This is normal text.</p>
         <p><a href="https://www.google.com/">Link to Google</a></p>
         <p><a href="javascript:void(0);" onclick="output('Link Text Clicked!');">Link Text</a></p>
-    </div>
+      </div>
 
   <div name='Buttons'>
   <h2>Buttons</h2>
   <p>
-  <input type="button" id="btn1" onclick="output('Button1 Clicked!')" value="Button1" />
+  <input type="button" id="btn1" onclick="output('Button1 Clicked!')" oncontextmenu="output('Button1 Right Clicked!');return false;" value="Button1" />
   <input type="button" id="btn2" onclick="output('Button2 Clicked!')" value="Button2 (Disabled)" disabled />
+  <input type="button" id="btn3" ondblclick="output('Button3 Double Clicked!')" value="Button3" />
   <input type="button" id="btnClearOutput" onclick="output('')" value="Clear" />
   </p>
   <p>
