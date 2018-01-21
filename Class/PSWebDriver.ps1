@@ -88,6 +88,7 @@ class SpecialKeys {
 class PSWebDriver {
     #region Public Properties
     $Driver
+    $Actions
     #endregion
 
     #region Hidden properties
@@ -210,6 +211,9 @@ class PSWebDriver {
         }
         #Set default implicit wait
         if ($this.Driver) {$this.SetImplicitWait($this.ImplicitWait)}
+
+        #Create Action instancec
+        if ($this.Driver) {$this.Actions = iex '[OpenQA.Selenium.Interactions.Actions]::New($this.Driver)'}
     }
 
     [void]Start([Uri]$URL) {
@@ -452,6 +456,22 @@ class PSWebDriver {
     [void]JavaScriptClick([string]$Target) {
         if ($element = $this.FindElement($Target)) {
             $this.Driver.ExecuteScript('arguments[0].click();', $element)
+        }
+    }
+    #endregion
+
+    #region Method:DoubleClick()
+    [void]DoubleClick([string]$Target) {
+        if ($element = $this.FindElement($Target)) {
+            $this.Actions.DoubleClick($element).build().perform()
+        }
+    }
+    #endregion
+
+    #region Method:RightClick()
+    [void]RightClick([string]$Target) {
+        if ($element = $this.FindElement($Target)) {
+            $this.Actions.ContextClick($element).build().perform()
         }
     }
     #endregion
@@ -937,7 +957,7 @@ class PSWebDriver {
 
                 #forDebug
                 # $global:Logging = @()
-                $Action = {
+                $RecordAction = {
                     $Id = [string]$Event.MessageData
                     $localCounter = [int](Get-Variable -Name ('Counter' + $Id) -ea SilentlyContinue).Value
                     #停止し忘れやメモリ食いつぶしを防ぐために最大記録回数を制限する
@@ -962,7 +982,7 @@ class PSWebDriver {
                     }
                 }
 
-                Register-ObjectEvent -InputObject $this.Timer -EventName Elapsed -SourceIdentifier $this.InstanceId -Action $Action -MessageData $this.InstanceId> $null
+                Register-ObjectEvent -InputObject $this.Timer -EventName Elapsed -SourceIdentifier $this.InstanceId -Action $RecordAction -MessageData $this.InstanceId> $null
             }
             catch {
                 throw 'Failed Initilize GIF Recorder'
