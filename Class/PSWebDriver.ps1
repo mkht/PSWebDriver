@@ -28,6 +28,7 @@ Enum SelectorType{
 class Selector {
     [string]$Expression
     [SelectorType]$Type = [SelectorType]::None
+    [Object]$By
 
     Selector() {
     }
@@ -39,6 +40,7 @@ class Selector {
     Selector([string]$Expression, [SelectorType]$Type) {
         $this.Expression = $Expression
         $this.Type = $Type
+        $this.By = [Selector]::GetSeleniumBy($Expression, $Type)
     }
 
     [string]ToString() {
@@ -58,6 +60,23 @@ class Selector {
             Default {[Selector]::new($Expression)}
         }
         return $ret
+    }
+
+    static Hidden [Object]GetSeleniumBy([string]$Expression, [SelectorType]$Type) {
+        $local:SelectorObj =
+        switch ($Type) {
+            'Id' { iex '[OpenQA.Selenium.By]::Id($Expression)' }
+            'Name' { iex '[OpenQA.Selenium.By]::Name($Expression)'}
+            'Tag' { iex '[OpenQA.Selenium.By]::TagName($Expression)' }
+            'ClassName' { iex '[OpenQA.Selenium.By]::ClassName($Expression)'}
+            'Link' { iex '[OpenQA.Selenium.By]::LinkText($Expression)' }
+            'XPath' { iex '[OpenQA.Selenium.By]::XPath($Expression)' }
+            'Css' { iex '[OpenQA.Selenium.By]::CssSelector($Expression)'}
+            Default {
+                throw 'Undefind selector type'
+            }
+        }
+        return $SelectorObj
     }
 }
 #endregion
@@ -331,23 +350,9 @@ class PSWebDriver {
             return $null
         }
         else {
-            $local:SelectorObj =
-            switch ($Selector.Type) {
-                'Id' { iex '[OpenQA.Selenium.By]::Id($Selector.ToString())' }
-                'Name' { iex '[OpenQA.Selenium.By]::Name($Selector.ToString())'}
-                'Tag' { iex '[OpenQA.Selenium.By]::TagName($Selector.ToString())' }
-                'ClassName' { iex '[OpenQA.Selenium.By]::ClassName($Selector.ToString())'}
-                'Link' { iex '[OpenQA.Selenium.By]::LinkText($Selector.ToString())' }
-                'XPath' { iex '[OpenQA.Selenium.By]::XPath($Selector.ToString())' }
-                'Css' { iex '[OpenQA.Selenium.By]::CssSelector($Selector.ToString())'}
-                Default {
-                    throw 'Undefind selector type'
-                    return $null
-                }
-            }
-            if ($SelectorObj) {
+            if ($Selector.By) {
                 $this.WaitForPageToLoad($this.PageLoadTimeout)
-                return $this.Driver.FindElement($SelectorObj)
+                return $this.Driver.FindElement($Selector.By)
             }
             return $null
         }
@@ -369,23 +374,9 @@ class PSWebDriver {
             return $null
         }
         else {
-            $local:SelectorObj =
-            switch ($Selector.Type) {
-                'Id' { iex '[OpenQA.Selenium.By]::Id($Selector.ToString())' }
-                'Name' { iex '[OpenQA.Selenium.By]::Name($Selector.ToString())'}
-                'Tag' { iex '[OpenQA.Selenium.By]::TagName($Selector.ToString())' }
-                'ClassName' { iex '[OpenQA.Selenium.By]::ClassName($Selector.ToString())'}
-                'Link' { iex '[OpenQA.Selenium.By]::LinkText($Selector.ToString())' }
-                'XPath' { iex '[OpenQA.Selenium.By]::XPath($Selector.ToString())' }
-                'Css' { iex '[OpenQA.Selenium.By]::CssSelector($Selector.ToString())'}
-                Default {
-                    throw 'Undefind selector type'
-                    return $null
-                }
-            }
-            if ($SelectorObj) {
+            if ($Selector.By) {
                 $this.WaitForPageToLoad($this.PageLoadTimeout)
-                return $this.Driver.FindElements($SelectorObj)
+                return $this.Driver.FindElements($Selector.By)
             }
             return $null
         }
