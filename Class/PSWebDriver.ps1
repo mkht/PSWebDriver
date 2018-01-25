@@ -483,7 +483,7 @@ class PSWebDriver {
             $this._WarnBrowserNotStarted()
         }
         else {
-            $FoundFlag = $false
+            $IsWindowFound = $false
             $Pattern = $this._PerseSeleniumPattern($Title)
             $CurrentWindow = $this.Driver.CurrentWindowHandle
             $AllWindow = $this.Driver.WindowHandles
@@ -499,26 +499,26 @@ class PSWebDriver {
                 switch ($Pattern.Matcher) {
                     'Like' {
                         if ($title -like $Pattern.Pattern) {
-                            $FoundFlag = $true
+                            $IsWindowFound = $true
                             break SWLOOP
                         }
                     }
                     'RegExp' {
                         if ($title -match $Pattern.Pattern) {
-                            $FoundFlag = $true
+                            $IsWindowFound = $true
                             break SWLOOP
                         }
                     }
                     'Equal' {
                         if ($title -eq $Pattern.Pattern) {
-                            $FoundFlag = $true
+                            $IsWindowFound = $true
                             break SWLOOP
                         }
                     }
                 }
             }
 
-            if (!$FoundFlag) {
+            if (!$IsWindowFound) {
                 if ($this.Driver.CurrentWindowHandle -ne $CurrentWindow) {
                     #Retrun current window
                     $this.Driver.SwitchTo().Window($CurrentWindow)
