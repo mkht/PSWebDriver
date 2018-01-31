@@ -467,6 +467,23 @@ class PSWebDriver {
     }
     #endregion
 
+    #region Method:ClickAt()
+    [void]ClickAt([int]$X, [int]$Y) {
+        if (!$this.Driver) {
+            $this._WarnBrowserNotStarted()
+            return
+        }
+        else {
+            $js = @"
+            var e = document.createEvent('MouseEvents');
+            e.initMouseEvent('click',true,true,window,1,0,0,$X,$Y,false,false,false,false,0,null,);
+            document.body.dispatchEvent(e);
+"@
+            $this.ExecuteScript($js)
+        }
+    }
+    #endregion
+
     #region Method:Select()
     [void]Select([string]$Target, [string]$Value) {
         if ($SelectElement = $this._GetSelectElement($Target)) {
