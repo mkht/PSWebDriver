@@ -626,6 +626,13 @@ class PSWebDriver {
             }
         }
         catch {}
+
+        #hack for Edge
+        #In case of Edge, executing the command immediately after closing an alert often fails, so wait a little.
+        if($this.StrictBrowserName -eq 'Edge'){
+            [System.Threading.Thread]::Sleep(500)
+        }
+
         return $AlertText
     }
     #endregion
