@@ -231,7 +231,7 @@ class PSWebDriver {
         #Set default implicit wait
         if ($this.Driver) {$this.SetImplicitWait($this.ImplicitWait)}
 
-        #Create Action instancec
+        #Create Action instance
         if ($this.Driver) {$this.Actions = iex '[OpenQA.Selenium.Interactions.Actions]::New($this.Driver)'}
     }
 
