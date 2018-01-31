@@ -165,7 +165,7 @@ Describe 'RightClick()' {
 
 Describe 'SendKeys()' {
     BeforeEach {
-        $Driver.Click('id=reset')
+        $Driver.FindElement('name=first_name').Clear()
     }
 
     It 'Input "ABC"' {
@@ -316,6 +316,10 @@ Describe 'IsAlertPresent()' {
         $Driver.Click('id=btnPrompt')
         $Driver.IsAlertPresent() | Should -Be $true
     }
+
+    AfterEach{
+        $Driver.CloseAlert()
+    }
 }
 
 Describe 'CloseAlert() & CloseAlertAndGetText()' {
@@ -351,6 +355,10 @@ Describe 'CloseAlert() & CloseAlertAndGetText()' {
         $Driver.CloseAlertAndGetText($false) | Should -Be 'Chose an option.'
         $Driver.IsAlertPresent() | Should -Be $false
         $Driver.GetText('id=output') | Should -Be 'Rejected!'
+    }
+
+    AfterEach{
+        $Driver.CloseAlert()
     }
 }
 
