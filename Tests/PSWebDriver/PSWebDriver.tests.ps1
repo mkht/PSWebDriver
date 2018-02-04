@@ -1,4 +1,7 @@
-﻿<#
+﻿#Requires -Version 5.0
+#Requires -Modules @{ ModuleName="Pester"; ModuleVersion="4.1.0" }
+
+<#
 # Tests for PSWebDriver Class
 #>
 $moduleRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
@@ -317,7 +320,7 @@ Describe 'IsAlertPresent()' {
         $Driver.IsAlertPresent() | Should -Be $true
     }
 
-    AfterEach{
+    AfterEach {
         $Driver.CloseAlert()
     }
 }
@@ -357,7 +360,7 @@ Describe 'CloseAlert() & CloseAlertAndGetText()' {
         $Driver.GetText('id=output') | Should -Be 'Rejected!'
     }
 
-    AfterEach{
+    AfterEach {
         $Driver.CloseAlert()
     }
 }
