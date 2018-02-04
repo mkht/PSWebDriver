@@ -1,4 +1,4 @@
-#Requires -Version 5.0
+﻿#Requires -Version 5.0
 using namespace OpenQA.Selenium
 
 #region Enum:ImageFormat
@@ -773,7 +773,18 @@ class PSWebDriver {
     }
 
     [void]SaveScreenShot([string]$FileName) {
-        $this.SaveScreenShot($FileName, [ImageFormat]::Png)
+        [ImageFormat]$Format =
+        switch ([System.IO.Path]::GetExtension($FileName)) {
+            '.jpg' { [ImageFormat]::Jpeg; break }
+            '.jpeg' { [ImageFormat]::Jpeg; break }
+            '.bmp' { [ImageFormat]::Bmp; break }
+            '.gif' { [ImageFormat]::Gif; break }
+            '.tif' { [ImageFormat]::Tiff; break }
+            '.tiff' { [ImageFormat]::Tiff; break }
+            Default { [ImageFormat]::Png }
+        }
+
+        $this.SaveScreenShot($FileName, $Format)
     }
     #endregion
 
