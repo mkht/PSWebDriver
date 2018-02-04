@@ -1,4 +1,4 @@
-﻿#Require -Version 5.0
+#Require -Version 5.0
 using namespace OpenQA.Selenium
 
 #region Enum:ImageFormat
@@ -811,7 +811,7 @@ class PSWebDriver {
         else {
             $local:exe = $dir + '.exe'
         }
-        if (($this.StrictBrowserName -ne "Firefox") -and !(Get-Command $exe -ErrorAction SilentlyContinue)) {
+        if (!(Get-Command $exe -ErrorAction SilentlyContinue)) {
             $DriverPath = Join-Path $this.PSModuleRoot "\Bin\$dir"
             if (Resolve-Path $DriverPath -ErrorAction SilentlyContinue) {
                 if ($Env:Path.EndsWith(';')) {
@@ -838,6 +838,7 @@ class PSWebDriver {
 
     Hidden [string]_ParseDriverPackage([string]$BrowserName) {
         [string]$local:tmp = switch ($BrowserName) {
+            "Firefox" { "GeckoDriver" }
             "Edge" { "MicrosoftWebDriver" }
             "IE" { "IEDriver" }
             "InternetExplorer" { "IEDriver" }
