@@ -1,4 +1,4 @@
-#Require -Version 5.0
+﻿#Require -Version 5.0
 using namespace OpenQA.Selenium
 
 #region Enum:ImageFormat
@@ -629,7 +629,7 @@ class PSWebDriver {
 
         #hack for Edge
         #In case of Edge, executing the command immediately after closing an alert often fails, so wait a little.
-        if($this.StrictBrowserName -eq 'Edge'){
+        if ($this.StrictBrowserName -eq 'Edge') {
             [System.Threading.Thread]::Sleep(500)
         }
 
