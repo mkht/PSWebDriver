@@ -1,4 +1,4 @@
-﻿#Requires -Version 5.0
+#Requires -Version 5.0
 using namespace OpenQA.Selenium
 
 #region Enum:ImageFormat
@@ -762,6 +762,10 @@ class PSWebDriver {
             $this._WarnBrowserNotStarted()
         }
         else {
+            $SaveFolder = Split-Path $FileName -Parent
+            if (! (Test-Path $SaveFolder -PathType Container)) {
+                New-Item $SaveFolder -ItemType Directory
+            }
             #TODO:To alternate [System.Drawing.Image] class
             iex '$ScrrenShot = [OpenQA.Selenium.Screenshot]$this.Driver.GetScreenShot()'
             iex '$ScrrenShot.SaveAsFile($FileName, [OpenQA.Selenium.ScreenshotImageFormat]$ImageFormat)'
