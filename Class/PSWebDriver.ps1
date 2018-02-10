@@ -410,10 +410,13 @@ class PSWebDriver {
     #endregion
 
     #region Method:Sendkeys() & ClearAndType()
-    [void]SendKeys([string]$Target, [string]$Value) {
+    Hidden [void]_InnerSendKeys([string]$Target, [string]$Value, [bool]$BeforeClear) {
         if ($element = $this.FindElement($Target)) {
-            $Ret = $Value
-            $local:regex = [regex]'\$\{KEY_.+?\}'
+            if ($BeforeClear) {
+                $element.Clear()
+            }
+            $private:Ret = $Value
+            $private:regex = [regex]'\$\{KEY_.+?\}'
             $regex.Matches($Value) | % {
                 $Spec = $this.SpecialKeys.ConvertSeleniumKeys(($_.Value).SubString(2, ($_.Value.length - 3)))
                 $Ret = $Ret.Replace($_.Value, $Spec)
@@ -422,15 +425,12 @@ class PSWebDriver {
         }
     }
 
+    [void]SendKeys([string]$Target, [string]$Value) {
+        $this._InnerSendKeys($Target, $Value, $false)
+    }
+
     [void]ClearAndType([string]$Target, [string]$Value) {
-        if ($element = $this.FindElement($Target)) {
-            $element.Clear()
-            if (($Value -match '\$\{(KEY_.+)\}') -and ($this.SpecialKeys)) {
-                $Spec = $this.SpecialKeys.ConvertSeleniumKeys($Matches[1])
-                $Value = ($Value -replace '\$\{KEY_.+\}', $Spec)
-            }
-            $element.SendKeys($Value)
-        }
+        $this._InnerSendKeys($Target, $Value, $true)
     }
     #endregion
 
