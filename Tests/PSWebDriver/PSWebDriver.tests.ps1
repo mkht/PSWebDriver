@@ -200,16 +200,31 @@ Describe 'SendKeys()' {
         $Driver.SendKeys('name=first_name', 'H+${KEY_}llo${KEY_N7}${KEY_N7}@.comA${KEY_BKSP}')
         $Driver.GetAttribute('name=first_name', 'value') | Should -Be 'H+${KEY_}llo77@.com'
     }
+
+    It 'Input SecureString' {
+        $PlainString = 'P@ssW0rD!'
+        $SecureString = ConvertTo-SecureString $PlainString -AsPlainText -Force
+        $Driver.SendKeys('name=first_name', $SecureString)
+        $Driver.GetAttribute('name=first_name', 'value') | Should -Be $PlainString
+    }
 }
 
 Describe 'ClearAndType()' {
     BeforeEach {
-        $Driver.Click('id=reset')
+        $Driver.FindElement('name=first_name').Clear()
+        $Driver.SendKeys('name=first_name', 'Already Has Text !')
     }
 
     It 'Input "ABC" to textbox that has text already' {
         $Driver.ClearAndType('name=last_name', 'ABC')
         $Driver.GetAttribute('name=last_name', 'value') | Should -Be 'ABC'
+    }
+
+    It 'Input SecureString' {
+        $PlainString = 'P@ssW0rD!'
+        $SecureString = ConvertTo-SecureString $PlainString -AsPlainText -Force
+        $Driver.ClearAndType('name=first_name', $SecureString)
+        $Driver.GetAttribute('name=first_name', 'value') | Should -Be $PlainString
     }
 }
 
