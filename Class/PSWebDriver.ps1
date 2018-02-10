@@ -422,22 +422,6 @@ class PSWebDriver {
         }
     }
 
-    [void]SendKeys([string]$Target, [securestring]$Value) {
-        try {
-            $bstr = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($Value)
-            $this.SendKeys($Target, [System.Runtime.InteropServices.Marshal]::PtrToStringBSTR($bstr))
-        }
-        catch {
-            throw $_.Exception 
-        }
-        finally {
-            if ($bstr) {
-                [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($bstr)
-                $bstr = $null
-            }
-        } 
-    }
-
     [void]ClearAndType([string]$Target, [string]$Value) {
         if ($element = $this.FindElement($Target)) {
             $element.Clear()
@@ -447,22 +431,6 @@ class PSWebDriver {
             }
             $element.SendKeys($Value)
         }
-    }
-
-    [void]ClearAndType([string]$Target, [securestring]$Value) {
-        try {
-            $bstr = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($Value)
-            $this.ClearAndType($Target, [System.Runtime.InteropServices.Marshal]::PtrToStringBSTR($bstr))
-        }
-        catch {
-            throw $_.Exception 
-        }
-        finally {
-            if ($bstr) {
-                [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($bstr)
-                $bstr = $null
-            }
-        } 
     }
     #endregion
 
