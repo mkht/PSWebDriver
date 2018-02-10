@@ -204,7 +204,8 @@ Describe 'SendKeys()' {
 
 Describe 'ClearAndType()' {
     BeforeEach {
-        $Driver.Click('id=reset')
+        $Driver.FindElement('name=first_name').Clear()
+        $Driver.SendKeys('name=first_name', 'Already Has Text !')
     }
 
     It 'Input "ABC" to textbox that has text already' {
