@@ -763,7 +763,7 @@ class PSWebDriver {
         }
         else {
             $SaveFolder = Split-Path $FileName -Parent
-            if (! (Test-Path $SaveFolder -PathType Container)) {
+            if (! (Test-Path -LiteralPath $SaveFolder -PathType Container)) {
                 New-Item $SaveFolder -ItemType Directory
             }
             #TODO:To alternate [System.Drawing.Image] class
