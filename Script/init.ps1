@@ -30,3 +30,8 @@ if (("OpenQA.Selenium.By" -as [type]) -and !("OpenQA.Selenium.Support.UI.SelectE
         Write-Error "Couldn't load Selenium Support"
     }
 }
+
+# Import Assert function
+if ($AssertPath = Resolve-Path "$PSModuleRoot\Function\Assert.psm1" -ea SilentlyContinue) {
+    Import-Module $AssertPath -Force
+}

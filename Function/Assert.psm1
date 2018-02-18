@@ -81,3 +81,7 @@
     }
 
 }
+
+Export-ModuleMember -Function @(
+    'Assert'
+)
