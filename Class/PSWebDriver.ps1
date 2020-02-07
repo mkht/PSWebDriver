@@ -73,7 +73,7 @@ class Selector {
             'XPath' { iex '[OpenQA.Selenium.By]::XPath($Expression)' }
             'Css' { iex '[OpenQA.Selenium.By]::CssSelector($Expression)' }
             Default {
-                throw 'Undefind selector type'
+                throw 'Undefined selector type'
             }
         }
         return $SelectorObj
@@ -321,7 +321,7 @@ class PSWebDriver {
         }
     }
 
-    # Aliase of Open()
+    # Aliases of Open()
     [void]SetLocation([Uri]$URL) {
         $this.Location = $URL
     }
@@ -537,7 +537,7 @@ class PSWebDriver {
 
             if (!$IsWindowFound) {
                 if ($this.Driver.CurrentWindowHandle -ne $CurrentWindow) {
-                    #Retrun current window
+                    #Return current window
                     $this.Driver.SwitchTo().Window($CurrentWindow)
                 }
                 #throw NoSuchWindowException
@@ -767,8 +767,8 @@ class PSWebDriver {
                 New-Item $SaveFolder -ItemType Directory
             }
             #TODO:To alternate [System.Drawing.Image] class
-            iex '$ScrrenShot = [OpenQA.Selenium.Screenshot]$this.Driver.GetScreenShot()'
-            iex '$ScrrenShot.SaveAsFile($FileName, [OpenQA.Selenium.ScreenshotImageFormat]$ImageFormat)'
+            iex '$ScreenShot = [OpenQA.Selenium.Screenshot]$this.Driver.GetScreenShot()'
+            iex '$ScreenShot.SaveAsFile($FileName, [OpenQA.Selenium.ScreenshotImageFormat]$ImageFormat)'
         }
     }
 
@@ -1016,8 +1016,8 @@ class PSWebDriver {
                 Register-ObjectEvent -InputObject $this.Timer -EventName Elapsed -SourceIdentifier $this.InstanceId -Action $RecordAction -MessageData $this.InstanceId> $null
             }
             catch {
-                throw 'Failed Initilize GIF Recorder'
-                $this._DisposeRecorder()    #Dispose recorder when error occured.
+                throw 'Failed Initialize GIF Recorder'
+                $this._DisposeRecorder()    #Dispose recorder when error occurred.
             }
         }
     }
@@ -1060,7 +1060,7 @@ class PSWebDriver {
             return
         }
 
-        #Chack is recoder already started
+        #Check is recorder already started
         if (Get-EventSubscriber -SourceIdentifier $this.InstanceId -ea SilentlyContinue) {
             throw 'Recorder has already started !'
             return
