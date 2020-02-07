@@ -57,7 +57,7 @@ class Selector {
             '^xpath=(.+)' { [Selector]::new($Matches[1], [SelectorType]::XPath) }
             '^/.+' { [Selector]::new($Matches[0], [SelectorType]::XPath) }
             '^css=(.+)' { [Selector]::new($Matches[1], [SelectorType]::Css) }
-            Default {[Selector]::new($Expression)}
+            Default { [Selector]::new($Expression) }
         }
         return $ret
     }
@@ -66,12 +66,12 @@ class Selector {
         $local:SelectorObj =
         switch ($Type) {
             'Id' { iex '[OpenQA.Selenium.By]::Id($Expression)' }
-            'Name' { iex '[OpenQA.Selenium.By]::Name($Expression)'}
+            'Name' { iex '[OpenQA.Selenium.By]::Name($Expression)' }
             'Tag' { iex '[OpenQA.Selenium.By]::TagName($Expression)' }
-            'ClassName' { iex '[OpenQA.Selenium.By]::ClassName($Expression)'}
+            'ClassName' { iex '[OpenQA.Selenium.By]::ClassName($Expression)' }
             'Link' { iex '[OpenQA.Selenium.By]::LinkText($Expression)' }
             'XPath' { iex '[OpenQA.Selenium.By]::XPath($Expression)' }
-            'Css' { iex '[OpenQA.Selenium.By]::CssSelector($Expression)'}
+            'Css' { iex '[OpenQA.Selenium.By]::CssSelector($Expression)' }
             Default {
                 throw 'Undefind selector type'
             }
@@ -91,7 +91,7 @@ class SpecialKeys {
     }
 
     [string]ConvertSeleniumKeys([string]$key) {
-        if (!$this.KeyMap) {return ''}
+        if (!$this.KeyMap) { return '' }
         if ($this.KeyMap.ContainsKey($key)) {
             $tmp = $this.KeyMap.$key
             return [string](iex '[OpenQA.Selenium.keys]::($tmp)')
@@ -127,7 +127,7 @@ class PSWebDriver {
     #region Constructor:PSWebDriver
     PSWebDriver([string]$Browser) {
         $this.PSModuleRoot = Split-Path $PSScriptRoot -Parent
-        $this.InstanceId = [string]( -join ((1..4) | % {Get-Random -input ([char[]]((48..57) + (65..90) + (97..122)))})) #4-digits random id
+        $this.InstanceId = [string]( -join ((1..4) | % { Get-Random -input ([char[]]((48..57) + (65..90) + (97..122))) })) #4-digits random id
         $this.BrowserName = $Browser
         $this.StrictBrowserName = $this._ParseBrowserName($Browser)
         $this.DriverPackage = $this._ParseDriverPackage($Browser)
@@ -229,10 +229,10 @@ class PSWebDriver {
             $this.Driver = New-Object $tmp($Options)
         }
         #Set default implicit wait
-        if ($this.Driver) {$this.SetImplicitWait($this.ImplicitWait)}
+        if ($this.Driver) { $this.SetImplicitWait($this.ImplicitWait) }
 
         #Create Action instance
-        if ($this.Driver) {$this.Actions = iex '[OpenQA.Selenium.Interactions.Actions]::New($this.Driver)'}
+        if ($this.Driver) { $this.Actions = iex '[OpenQA.Selenium.Interactions.Actions]::New($this.Driver)' }
     }
 
     [void]Start([Uri]$URL) {
@@ -248,7 +248,7 @@ class PSWebDriver {
             try {
                 $this._DisposeRecorder()
             }
-            catch {}
+            catch { }
         }
 
         if (!$this.Driver) {
@@ -396,7 +396,7 @@ class PSWebDriver {
         [int]$tmpWait = $this.ImplicitWait
         try {
             # Set implicit wait to 0 sec temporally.
-            if ($this.Driver) {$this.SetImplicitWait(0)}
+            if ($this.Driver) { $this.SetImplicitWait(0) }
             return [bool]($this.FindElement([Selector]::Parse($SelectorExpression)))
         }
         catch {
@@ -404,7 +404,7 @@ class PSWebDriver {
         }
         finally {
             # Reset implicit wait
-            if ($this.Driver) {$this.SetImplicitWait($tmpWait)}
+            if ($this.Driver) { $this.SetImplicitWait($tmpWait) }
         }
     }
     #endregion
@@ -625,7 +625,7 @@ class PSWebDriver {
                 $Alert.Dismiss()
             }
         }
-        catch {}
+        catch { }
 
         #hack for Edge
         #In case of Edge, executing the command immediately after closing an alert often fails, so wait a little.
@@ -662,60 +662,60 @@ class PSWebDriver {
 
     #region Method:WaitForElementPresent()
     [bool]WaitForElementPresent([string]$Target, [int]$Timeout) {
-        $sb = [ScriptBlock] {$this.AssertElementPresent($Target)}
+        $sb = [ScriptBlock] { $this.AssertElementPresent($Target) }
         return $this._WaitForBase($sb, $Timeout)
     }
 
     [bool]WaitForElementNotPresent([string]$Target, [int]$Timeout) {
-        $sb = [ScriptBlock] {$this.AssertElementNotPresent($Target)}
+        $sb = [ScriptBlock] { $this.AssertElementNotPresent($Target) }
         return $this._WaitForBase($sb, $Timeout)
     }
     #endregion
 
     #region Method:WaitForValue()
     [bool]WaitForValue([string]$Target, [string]$Value, [int]$Timeout) {
-        $sb = [ScriptBlock] {$this.AssertValue($Target, $Value)}
+        $sb = [ScriptBlock] { $this.AssertValue($Target, $Value) }
         return $this._WaitForBase($sb, $Timeout)
     }
 
     [bool]WaitForNotValue([string]$Target, [string]$Value, [int]$Timeout) {
-        $sb = [ScriptBlock] {$this.AssertNotValue($Target, $Value)}
+        $sb = [ScriptBlock] { $this.AssertNotValue($Target, $Value) }
         return $this._WaitForBase($sb, $Timeout)
     }
     #endregion
 
     #region Method:WaitForText()
     [bool]WaitForText([string]$Target, [string]$Value, [int]$Timeout) {
-        $sb = [ScriptBlock] {$this.AssertText($Target, $Value)}
+        $sb = [ScriptBlock] { $this.AssertText($Target, $Value) }
         return $this._WaitForBase($sb, $Timeout)
     }
 
     [bool]WaitForNotText([string]$Target, [string]$Value, [int]$Timeout) {
-        $sb = [ScriptBlock] {$this.AssertNotText($Target, $Value)}
+        $sb = [ScriptBlock] { $this.AssertNotText($Target, $Value) }
         return $this._WaitForBase($sb, $Timeout)
     }
     #endregion
 
     #region Method:WaitForVisible()
     [bool]WaitForVisible([string]$Target, [int]$Timeout) {
-        $sb = [ScriptBlock] {$this.AssertVisible($Target)}
+        $sb = [ScriptBlock] { $this.AssertVisible($Target) }
         return $this._WaitForBase($sb, $Timeout)
     }
 
     [bool]WaitForNotVisible([string]$Target, [int]$Timeout) {
-        $sb = [ScriptBlock] {$this.AssertNotVisible($Target)}
+        $sb = [ScriptBlock] { $this.AssertNotVisible($Target) }
         return $this._WaitForBase($sb, $Timeout)
     }
     #endregion
 
     #region Method:WaitForTitle()
     [bool]WaitForTitle([string]$Value, [int]$Timeout) {
-        $sb = [ScriptBlock] {$this.AssertTitle($Value)}
+        $sb = [ScriptBlock] { $this.AssertTitle($Value) }
         return $this._WaitForBase($sb, $Timeout)
     }
 
     [bool]WaitForNotTitle([string]$Value, [int]$Timeout) {
-        $sb = [ScriptBlock] {$this.AssertNotTitle($Value)}
+        $sb = [ScriptBlock] { $this.AssertNotTitle($Value) }
         return $this._WaitForBase($sb, $Timeout)
     }
     #endregion
@@ -846,7 +846,7 @@ class PSWebDriver {
         [string]$local:tmp = switch ($BrowserName) {
             "InternetExplorer" { "IE" }
             "HeadlessChrome" { "Chrome" }
-            Default {$_}
+            Default { $_ }
         }
         return $tmp
     }
@@ -886,7 +886,7 @@ class PSWebDriver {
 
         [int]$tmpWait = $this.ImplicitWait
         # Set implicit wait to 0 sec temporally.
-        if ($this.Driver) {$this.SetImplicitWait(0)}
+        if ($this.Driver) { $this.SetImplicitWait(0) }
 
         $sec = 0;
         [bool]$ret = $false
@@ -908,7 +908,7 @@ class PSWebDriver {
             $sec++
         } while ($true)
 
-        if ($this.Driver) {$this.SetImplicitWait($tmpWait)}
+        if ($this.Driver) { $this.SetImplicitWait($tmpWait) }
         return $ret
     }
 
@@ -1027,7 +1027,7 @@ class PSWebDriver {
             try {
                 $this.Timer.Close() #Stop timer
             }
-            catch {}
+            catch { }
             finally {
                 $this.Timer = $null
             }
@@ -1041,7 +1041,7 @@ class PSWebDriver {
             try {
                 (Get-Variable ('Recorder' + $this.InstanceId)).Value.Dispose()
             }
-            catch {}
+            catch { }
             finally {
                 Remove-Variable -Name ('Recorder' + $this.InstanceId) -Scope Global
             }
@@ -1100,7 +1100,7 @@ class PSWebDriver {
 
             Unregister-Event $this.InstanceId -ea SilentlyContinue
         }
-        catch {}
+        catch { }
         finally {
             $this._DisposeRecorder()
         }
