@@ -177,19 +177,19 @@ $Browser.SendKeys('id=target', 'ABC${KEY_BACKSPACE}${KEY_ENTER}')
 
 ----
 ## ライセンス
-> Copyright (c) 2018 mkht
+> Copyright (c) 2020 mkht
 > PSWebDriver is released under the MIT License
 > https://github.com/mkht/PSWebDriver/blob/master/LICENSE
 >
 > PSWebDriver includes these software / libraries.
 > * Selenium.WebDriver
-> Copyright (c) 2017 Software Freedom Conservancy
+> Copyright (c) Software Freedom Conservancy
 > Licensed under the [Apache 2.0 License](http://www.apache.org/licenses/LICENSE-2.0).
 >
 > * Selenium.Support
-> Copyright (c) 2017 Software Freedom Conservancy
+> Copyright (c) Software Freedom Conservancy
 > Licensed under the [Apache 2.0 License](http://www.apache.org/licenses/LICENSE-2.0).
 >
 > * AnimatedGif
-> Copyright (c) 2017 mrousavy
+> Copyright (c) mrousavy
 > Licensed under the [MIT License](https://github.com/mrousavy/AnimatedGif/blob/master/LICENSE).
