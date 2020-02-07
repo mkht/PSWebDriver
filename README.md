@@ -2,9 +2,25 @@
 
 Selenium WebDriverをPowerShellから使用しやすくするラッパークラス+便利な関数群
 
+
 ## インストール方法
-1. 使用したい[ブラウザ用のDriver](http://www.seleniumhq.org/download/#thirdPartyDrivers)をインストールしてPATHを通しておきます（Firefoxは不要）
+1. 使用したいブラウザ用のDriverをインストールしてPATHを通しておきます
 1. このレポジトリをダウンロードしてPowerShellのモジュールディレクトリに配置します
+
+#### 各ブラウザ用のDriver入手先
++ **Google Chrome**  
+https://chromedriver.chromium.org/
+
++ **Mozilla Firefox**  
+https://github.com/mozilla/geckodriver
+
++ **Microsoft Edge**  
+https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/
+
++ **Internet Explorer**  
+https://selenium.dev/downloads/  
+※Internet Explorerを使用する場合、[追加の設定](https://github.com/SeleniumHQ/selenium/wiki/InternetExplorerDriver#required-configuration)が必要ですのでご注意ください
+
 
 ## 使い方
 
@@ -31,7 +47,7 @@ $Browser.Close()
 ----
 ## リファレンス
 ### PSWebDriver クラス
-Selenium WebDriverをPowerShellから利用するためのラッパークラスです。
+Selenium WebDriverをPowerShellから利用するためのラッパークラスです。  
 メソッド名などSelenium IDEで作成したテストケースをPowerShellスクリプトに置き換えやすくするよう意識しています。
 
 ----
@@ -104,73 +120,73 @@ Selenium WebDriverをPowerShellから利用するためのラッパークラス�
 |SaveScreenShot([string]$FileName)|void|スクリーンショットを保存します<br>画像形式はPNGです|
 |SaveScreenShot([string]$FileName, [string]$ImageFormat)|void|画像形式を指定してスクリーンショットを保存します<br>`$ImageFormat`に指定可能な値は`Png`,`Jpeg`,`Gif`,`Tiff`,`Bmp`です|
 |StartAnimationRecord([int]$Interval)|void|ブラウザ表示の動画記録を開始します<br>`$Interval`(ミリ秒)で指定した間隔で記録します<br>記録間隔の最小値は500msです<br>最大1200フレームまで記録できます|
-|StartAnimationRecord()|void|`StartAnimationRecord()`で開始した動画記録を終了します<br>記録された動画は破棄されます|
-|StartAnimationRecord([string]$FileName)|void|`StartAnimationRecord()`で開始した動画記録を終了し、ファイルに保存します<br>動画形式はアニメーションGIFです|
+|StopAnimationRecord()|void|`StartAnimationRecord()`で開始した動画記録を終了します<br>記録された動画は破棄されます|
+|StopAnimationRecord([string]$FileName)|void|`StartAnimationRecord()`で開始した動画記録を終了し、ファイルに保存します<br>動画形式はアニメーションGIFです|
 
 ----
 ### SelectorExpressionについて
 
-Webページ上の特定要素を指定するためのパターン文字列です。
-Selenium IDEのlocatorに相当します。書式もlocatorとほぼ同等です。
-以下の7種類が使用可能です。
+Webページ上の特定要素を指定するためのパターン文字列です。  
+Selenium IDEのlocatorに相当します。書式もlocatorとほぼ同等です。  
+以下の7種類が使用可能です。  
 
-* IDパターン
-`id`属性値を指定して要素を特定します。
-書式は`"id=idvalue"`です。
+* IDパターン  
+`id`属性値を指定して要素を特定します。  
+書式は`"id=idvalue"`です。  
 
-* Nameパターン
-`name`属性値を指定して要素を特定します。
-書式は`"name=elementname"`です。
+* Nameパターン  
+`name`属性値を指定して要素を特定します。  
+書式は`"name=elementname"`です。  
 
-* Tagパターン
-DOMタグを指定して要素を特定します。
-書式は`"tag=tagname"`です。
+* Tagパターン  
+DOMタグを指定して要素を特定します。  
+書式は`"tag=tagname"`です。  
 
-* ClassNameパターン
-Class名を指定して要素を特定します。
-書式は`"classname=classname"`です。
+* ClassNameパターン  
+Class名を指定して要素を特定します。  
+書式は`"classname=classname"`です。  
 
-* LinkTextパターン
-LinkのTextを指定して要素を特定します。※完全一致
-書式は`"link=linktext"`です。
+* LinkTextパターン  
+LinkのTextを指定して要素を特定します。※完全一致  
+書式は`"link=linktext"`です。  
 
-* XPathパターン
-XPath構文を使用して要素を特定します。
-書式は`"xpath=xpath"`です。
-SelectorExpressionが`/`で始まる場合もXPathパターンとみなされます。
-（`"xpath=/html/body/h1"`と`"/html/body/h1"`は同等です）
+* XPathパターン  
+XPath構文を使用して要素を特定します。  
+書式は`"xpath=xpath"`です。  
+SelectorExpressionが`/`で始まる場合もXPathパターンとみなされます。  
+（`"xpath=/html/body/h1"`と`"/html/body/h1"`は同等です）  
 
-* CSSセレクタパターン
-CSSセレクタを使用して要素を特定します。
-書式は`"css=selector"`です。
+* CSSセレクタパターン  
+CSSセレクタを使用して要素を特定します。  
+書式は`"css=selector"`です。  
 
 ----
 #### テキスト検索パターンについて
 `WaitForText()`や`WaitForValue()`など要素値を検証する一部のメソッドでは検索対象文字列に特殊な書式を使用することで検索パターンを指定することができます。
 
-* グロビングパターン
-いわゆるワイルドカード検索です。PowerShellの`-like`演算子に相当します。
-特殊な書式を使用しない場合はデフォルトでグロビングパターンが使用されます。
-明示的に指定する場合は検索文字列の前に`glob:`を付けます。
-例) `glob:sometext*`
+* グロビングパターン  
+いわゆるワイルドカード検索です。PowerShellの`-like`演算子に相当します。  
+特殊な書式を使用しない場合はデフォルトでグロビングパターンが使用されます。  
+明示的に指定する場合は検索文字列の前に`glob:`を付けます。  
+例) `glob:sometext*`  
 
-* 正規表現パターン
-正規表現を用いて検索します。PowerShellの`-match`演算子に相当します。
-検索文字列の前に`regexp:`を付けます。
-例) `regexp:^Number[0-9]`
+* 正規表現パターン  
+正規表現を用いて検索します。PowerShellの`-match`演算子に相当します。  
+検索文字列の前に`regexp:`を付けます。  
+例) `regexp:^Number[0-9]`  
 
-* 完全一致パターン
-完全一致検索を行います。PowerShellの`-eq`演算子に相当します。
-`*(アスタリスク)`などの特殊文字を検索したい場合に使用します。
-検索文字列の前に`exact:`を付けます。
-例) `exact:***asterisk****`
+* 完全一致パターン  
+完全一致検索を行います。PowerShellの`-eq`演算子に相当します。  
+`*(アスタリスク)`などの特殊文字を検索したい場合に使用します。  
+検索文字列の前に`exact:`を付けます。  
+例) `exact:***asterisk****`  
 
 ----
 #### 特殊キーの入力について
-`SendKeys()`や`ClearAndType()`でEnterキーや矢印キーなどの特殊キーを送信する場合は、`${KEY_CODE}`という書式を使用します。
+`SendKeys()`や`ClearAndType()`でEnterキーや矢印キーなどの特殊キーを送信する場合は、`${KEY_CODE}`という書式を使用します。  
 使用可能なKEY_CODEの一覧は[こちら](/Static/KEYMAP.txt)
 
-例）`SendKeys()`メソッドを使用してABC[Backspace][Enter]と入力する例
+例）`SendKeys()`メソッドを使用してABC[Backspace][Enter]と入力する例  
 ```PowerShell
 $Browser.SendKeys('id=target', 'ABC${KEY_BACKSPACE}${KEY_ENTER}')
 ```
