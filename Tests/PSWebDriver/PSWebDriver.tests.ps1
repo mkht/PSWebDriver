@@ -6,10 +6,60 @@
 #Requires -Version 5.0
 #Requires -Modules @{ ModuleName="Pester"; ModuleVersion="4.1.0" }
 
-$script:moduleRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
-$script:TestData = Join-Path $script:moduleRoot '\Tests\TestData\index.html'
+
+# Define Pester custom assertions
+function ThrowWithName([scriptblock]$ActualValue, [switch]$Negate, [string]$Name) {
+    [bool]$IsThrown = $false
+    try {
+        $ActualValue.Invoke()
+    }
+    catch {
+        [Exception]$err = $_.Exception
+        $IsThrown = $true
+    }
+
+    [string]$ExceptionName = $err.InnerException.GetType().Name.ToString()
+
+    if (-not $IsThrown) {
+        $Succeeded = $false
+        $FailureMessage = 'Not Thrown'
+        if ($Negate) {
+            $Succeeded = -not $Succeeded
+            $FailureMessage = ''
+        }
+
+        return New-Object PSObject -Property @{
+            Succeeded      = $Succeeded
+            FailureMessage = $FailureMessage
+        }
+    }
+    else {
+        if ($Negate) {
+            return New-Object PSObject -Property @{
+                Succeeded      = $false
+                FailureMessage = ('Exception "{0}" thrown' -f $ExceptionName)
+            }
+        }
+        elseif ($ExceptionName -ne $Name) {
+            return New-Object PSObject -Property @{
+                Succeeded      = $false
+                FailureMessage = ('Expected "{0}", but got "{1}"' -f $Name, $ExceptionName)
+            }
+        }
+        else {
+            return New-Object PSObject -Property @{
+                Succeeded      = $true
+                FailureMessage = ''
+            }
+        }
+    }
+}
+
+Add-AssertionOperator -Name ThrowWithName -Test $function:ThrowWithName
+
 
 # Import module
+$script:moduleRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 Get-Module 'PSWebDriver' | Remove-Module -Force
 Import-Module (Join-Path $script:moduleRoot './PSWebDriver.psd1') -Force
 
@@ -31,7 +81,7 @@ InModuleScope PSWebDriver {
 
                 It 'Throw NoSuchElementException when element not found' {
                     $selector = New-Selector -Expression 'notexist' -Type Id
-                    { $Driver.FindElement($selector) } | Should -Throw 'no such element'
+                    { $Driver.FindElement($selector) } | Should -ThrowWithName -Name 'NoSuchElementException'
                 }
             }
 
@@ -41,7 +91,7 @@ InModuleScope PSWebDriver {
                 }
 
                 It 'Throw NoSuchElementException when element not found' {
-                    { $Driver.FindElement('id=notexist') } | Should -Throw 'no such element'
+                    { $Driver.FindElement('id=notexist') } | Should -ThrowWithName -Name 'NoSuchElementException'
                 }
             }
 
@@ -51,7 +101,7 @@ InModuleScope PSWebDriver {
                 }
 
                 It 'Throw NoSuchElementException when element not found' {
-                    { $Driver.FindElement('notexist', [SelectorType]::Id) } | Should -Throw 'no such element'
+                    { $Driver.FindElement('notexist', [SelectorType]::Id) } | Should -ThrowWithName -Name 'NoSuchElementException'
                 }
             }
         }
@@ -243,9 +293,9 @@ InModuleScope PSWebDriver {
                 $Driver.GetTitle() | Should -Be 'New Window'
             }
 
-            It 'When target window not found, Stay current and throw NoSuchWindowException' {
+            It 'When target window not found, Stay current and throw exception' {
                 $Current = $Driver.GetTitle()
-                { $Driver.SelectWindow('non existence window') } | Should -Throw 'no such window'
+                { $Driver.SelectWindow('non existence window') } | Should -Throw
                 $Driver.GetTitle() | Should -Be $Current
             }
 
