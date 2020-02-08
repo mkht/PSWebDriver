@@ -26,10 +26,8 @@ https://selenium.dev/downloads/
 
 Google Chromeを使用して[DuckDuckGo](https://duckduckgo.com/)を開き、"PowerShell"と検索、検索結果のスクリーンショットを取得してブラウザを終了する例
 ```PowerShell
-#モジュールの読み込み
-using module PSWebDriver
 #インスタンスの生成
-$Browser = New-Object PSWebDriver('Chrome') #Chrome/Firefox/Edge/IE/HeadlessChrome
+$Browser = New-PSWebDriver 'Chrome' #Chrome/Firefox/Edge/IE/HeadlessChrome
 #ブラウザを起動
 $Browser.Start()
 #DuckDuckGoを開く
@@ -48,7 +46,12 @@ $Browser.Close()
 ## リファレンス
 ### PSWebDriver クラス
 Selenium WebDriverをPowerShellから利用するためのラッパークラスです。  
-メソッド名などSelenium IDEで作成したテストケースをPowerShellスクリプトに置き換えやすくするよう意識しています。
+メソッド名などSelenium IDEで作成したテストケースをPowerShellスクリプトに置き換えやすくするよう意識しています。  
+
+`PSWebDriver`クラスのインスタンスを生成するには`New-PSWebDriver`関数を使用します。
+```PowerShell
+$WebDriver = New-PSWebDriver -Name 'Chrome'
+```
 
 ----
 #### プロパティ
