@@ -1,4 +1,4 @@
-﻿#Requires -Version 5
+#Requires -Version 5
 using namespace OpenQA.Selenium
 
 #region Enum:ImageFormat
@@ -87,7 +87,7 @@ class SpecialKeys {
 
     SpecialKeys() {
         $PSModuleRoot = Split-Path $PSScriptRoot -Parent
-        $this.KeyMap = (ConvertFrom-StringData (Get-Content (Join-Path $PSModuleRoot "Static\KEYMAP.txt") -raw))
+        $this.KeyMap = (ConvertFrom-StringData (Get-Content (Join-Path $PSModuleRoot 'Static\KEYMAP.txt') -raw))
     }
 
     [string]ConvertSeleniumKeys([string]$key) {
@@ -212,14 +212,14 @@ class PSWebDriver {
         # for Headless Chrome
         if ($this.BrowserName -eq 'HeadlessChrome') {
             $Options = New-Object OpenQA.Selenium.Chrome.ChromeOptions
-            $Options.AddArgument("--headless")
+            $Options.AddArgument('--headless')
         }
 
         if ($this.StrictBrowserName -eq 'IE') {
             $local:tmp = 'OpenQA.Selenium.IE.InternetExplorerDriver'
         }
         else {
-            $local:tmp = [string]('OpenQA.Selenium.{0}.{0}{1}' -f $this.StrictBrowserName, "Driver")
+            $local:tmp = [string]('OpenQA.Selenium.{0}.{0}{1}' -f $this.StrictBrowserName, 'Driver')
         }
         #Start browser
         if (!$Options) {
@@ -601,7 +601,7 @@ class PSWebDriver {
             return $true
         }
         catch {
-            if ($_.Exception.InnerException.getType().FullName -eq "OpenQA.Selenium.NoAlertPresentException") {
+            if ($_.Exception.InnerException.getType().FullName -eq 'OpenQA.Selenium.NoAlertPresentException') {
                 Write-Verbose ('No Alert open.')
                 return $false
             }
@@ -791,7 +791,7 @@ class PSWebDriver {
     #region Hidden Method
     Hidden [void]_LoadSelenium() {
         $LibPath = Join-Path $this.PSModuleRoot '\Lib'
-        if (!("OpenQA.Selenium.By" -as [type])) {
+        if (!('OpenQA.Selenium.By' -as [type])) {
             if (!($SeleniumPath = Resolve-Path "$LibPath\Selenium.WebDriver.*\lib\net40" -ea SilentlyContinue)) {
                 throw "Couldn't find WebDriver.dll"
             }
@@ -804,7 +804,7 @@ class PSWebDriver {
             }
         }
 
-        if (("OpenQA.Selenium.By" -as [type]) -and !("OpenQA.Selenium.Support.UI.SelectElement" -as [type])) {
+        if (('OpenQA.Selenium.By' -as [type]) -and !('OpenQA.Selenium.Support.UI.SelectElement' -as [type])) {
             if (!($SeleniumPath = Resolve-Path "$LibPath\Selenium.Support.*\lib\net40" -ea SilentlyContinue)) {
                 throw "Couldn't find WebDriver.Support.dll"
             }
@@ -960,7 +960,7 @@ class PSWebDriver {
 
         # Load AnimatedGifWrapper class
         $LibPath = Join-Path $this.PSModuleRoot '\Lib'
-        if (!("AnimatedGifWrapper" -as [type])) {
+        if (!('AnimatedGifWrapper' -as [type])) {
             $local:CSharpCode = Get-Content (Join-Path $LibPath '\AnimatedGifWrapper\AnimatedGifWrapper.cs') -Raw -ea SilentlyContinue
             $local:DllPath = Resolve-Path "$LibPath\AnimatedGif.*\lib\AnimatedGif.dll" -ea SilentlyContinue
             try {
@@ -975,7 +975,7 @@ class PSWebDriver {
         }
 
         #Create background timer job
-        if ("AnimatedGifWrapper" -as [type]) {
+        if ('AnimatedGifWrapper' -as [type]) {
             try {
                 #Jobから実行できるようにGlobalスコープで作成
                 Set-Variable -Name ('Recorder' + $this.InstanceId) -Value (New-Object AnimatedGifWrapper) -Scope Global #他のインスタンスと被らないよう変数名にIDを付ける
