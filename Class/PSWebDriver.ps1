@@ -1188,6 +1188,40 @@ class PSWebDriver {
 }
 #endregion
 
-# #forDebug
-# $obj = New-Object PSWebDriver('Chrome')
-# $obj.Start('http://www.google.co.jp')
+function New-PSWebDriver {
+    [CmdletBinding()]
+    [OutputType([PSWebDriver])]
+    param(
+        [Parameter(Mandatory, Position = 0)]
+        [ValidateSet("Chrome", "Firefox", "Edge", "HeadlessChrome", "IE", "InternetExplorer")]
+        [string]
+        $Name
+    )
+
+    New-Object PSWebDriver($Name)
+}
+
+function New-Selector {
+    [CmdletBinding(DefaultParameterSetName = 'Default')]
+    [OutputType([Selector])]
+    param(
+        [Parameter(ParameterSetName = 'Default')]
+        [Parameter(Mandatory, ParameterSetName = 'WithType')]
+        [string]
+        $Expression,
+
+        [Parameter(ParameterSetName = 'WithType')]
+        [SelectorType]
+        $Type = [SelectorType]::None
+    )
+
+    if ([string]::IsNullOrEmpty($Expression)) {
+        New-Object Selector
+    }
+    elseif ($PSCmdlet.ParameterSetName -eq 'Default') {
+        New-Object Selector($Expression)
+    }
+    elseif ($PSCmdlet.ParameterSetName -eq 'WithType') {
+        New-Object Selector($Expression, $Type)
+    }
+}

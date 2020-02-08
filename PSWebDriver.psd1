@@ -12,7 +12,7 @@
     RootModule        = 'PSWebDriver.psm1'
 
     # このモジュールのバージョン番号です。
-    ModuleVersion     = '0.0.1'
+    ModuleVersion     = '0.0.2'
 
     # サポートされている PSEditions
     # CompatiblePSEditions = @()
@@ -57,10 +57,10 @@
     # RequiredAssemblies = @()
 
     # このモジュールをインポートする前に呼び出し元の環境で実行されるスクリプト ファイル (.ps1)。
-    ScriptsToProcess  = @(
-        'Script\init.ps1'
-        'Class\PSWebDriver.ps1'
-    )
+    # ScriptsToProcess  = @(
+    #     'Script\init.ps1'
+    #     'Class\PSWebDriver.ps1'
+    # )
 
     # このモジュールをインポートするときに読み込まれる型ファイル (.ps1xml)
     # TypesToProcess = @()
@@ -73,7 +73,8 @@
 
     # このモジュールからエクスポートする関数です。最適なパフォーマンスを得るには、ワイルドカードを使用せず、エクスポートする関数がない場合は、エントリを削除しないで空の配列を使用してください。
     FunctionsToExport = @(
-
+        'New-PSWebDriver',
+        'New-Selector'
     )
 
     # このモジュールからエクスポートするコマンドレットです。最適なパフォーマンスを得るには、ワイルドカードを使用せず、エクスポートするコマンドレットがない場合は、エントリを削除しないで空の配列を使用してください。
