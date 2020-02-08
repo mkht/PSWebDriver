@@ -1,4 +1,4 @@
-#Requires -Version 5
+﻿#Requires -Version 5
 using namespace OpenQA.Selenium
 
 #region Enum:ImageFormat
@@ -111,7 +111,7 @@ class PSWebDriver {
     #endregion
 
     #region Hidden properties
-    [ValidateSet("Chrome", "Firefox", "Edge", "HeadlessChrome", "IE", "InternetExplorer")]
+    [ValidateSet('Chrome', 'Firefox', 'Edge', 'HeadlessChrome', 'HeadlessFirefox', 'IE', 'InternetExplorer')]
     Hidden [string] $BrowserName
     Hidden [string] $InstanceId
     Hidden [SpecialKeys] $SpecialKeys
@@ -213,6 +213,10 @@ class PSWebDriver {
         if ($this.BrowserName -eq 'HeadlessChrome') {
             $Options = New-Object OpenQA.Selenium.Chrome.ChromeOptions
             $Options.AddArgument('--headless')
+        }
+        elseif ($this.BrowserName -eq 'HeadlessFirefox') {
+            $Options = New-Object OpenQA.Selenium.Firefox.FirefoxOptions
+            $Options.AddArgument('-headless')
         }
 
         if ($this.StrictBrowserName -eq 'IE') {
@@ -844,8 +848,9 @@ class PSWebDriver {
 
     Hidden [string]_ParseBrowserName([string]$BrowserName) {
         [string]$local:tmp = switch ($BrowserName) {
-            "InternetExplorer" { "IE"; break }
-            "HeadlessChrome" { "Chrome"; break }
+            'InternetExplorer' { 'IE'; break }
+            'HeadlessChrome' { 'Chrome'; break }
+            'HeadlessFirefox' { 'Firefox'; break }
             Default { $_ }
         }
         return $tmp
@@ -853,12 +858,13 @@ class PSWebDriver {
 
     Hidden [string]_ParseDriverPackage([string]$BrowserName) {
         [string]$local:tmp = switch ($BrowserName) {
-            "Firefox" { "GeckoDriver"; break }
-            "Edge" { "MicrosoftWebDriver"; break }
-            "IE" { "IEDriver"; break }
-            "InternetExplorer" { "IEDriver"; break }
-            "Chrome" { "ChromeDriver"; break }
-            "HeadlessChrome" { "ChromeDriver"; break }
+            'Firefox' { 'GeckoDriver'; break }
+            'HeadlessFirefox' { 'GeckoDriver'; break }
+            'Edge' { 'MicrosoftWebDriver'; break }
+            'IE' { 'IEDriver'; break }
+            'InternetExplorer' { 'IEDriver'; break }
+            'Chrome' { 'ChromeDriver'; break }
+            'HeadlessChrome' { 'ChromeDriver'; break }
             default { "${_}Driver" }
         }
         return $tmp
@@ -1196,7 +1202,7 @@ function New-PSWebDriver {
     [OutputType([PSWebDriver])]
     param(
         [Parameter(Mandatory, Position = 0)]
-        [ValidateSet("Chrome", "Firefox", "Edge", "HeadlessChrome", "IE", "InternetExplorer")]
+        [ValidateSet('Chrome', 'Firefox', 'Edge', 'HeadlessChrome', 'HeadlessFirefox', 'IE', 'InternetExplorer')]
         [string]
         $Name
     )
