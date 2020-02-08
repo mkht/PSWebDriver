@@ -49,14 +49,14 @@ class Selector {
 
     static [Selector]Parse([string]$Expression) {
         $local:ret = switch -Regex ($Expression) {
-            '^id=(.+)' { [Selector]::new($Matches[1], [SelectorType]::Id) }
-            '^name=(.+)' { [Selector]::new($Matches[1], [SelectorType]::Name) }
-            '^tag=(.+)' { [Selector]::new($Matches[1], [SelectorType]::Tag) }
-            '^className=(.+)' { [Selector]::new($Matches[1], [SelectorType]::ClassName) }
-            '^link=(.+)' { [Selector]::new($Matches[1], [SelectorType]::Link) }
-            '^xpath=(.+)' { [Selector]::new($Matches[1], [SelectorType]::XPath) }
-            '^/.+' { [Selector]::new($Matches[0], [SelectorType]::XPath) }
-            '^css=(.+)' { [Selector]::new($Matches[1], [SelectorType]::Css) }
+            '^id=(.+)' { [Selector]::new($Matches[1], [SelectorType]::Id); break }
+            '^name=(.+)' { [Selector]::new($Matches[1], [SelectorType]::Name); break }
+            '^tag=(.+)' { [Selector]::new($Matches[1], [SelectorType]::Tag); break }
+            '^className=(.+)' { [Selector]::new($Matches[1], [SelectorType]::ClassName); break }
+            '^link=(.+)' { [Selector]::new($Matches[1], [SelectorType]::Link); break }
+            '^xpath=(.+)' { [Selector]::new($Matches[1], [SelectorType]::XPath); break }
+            '^/.+' { [Selector]::new($Matches[0], [SelectorType]::XPath); break }
+            '^css=(.+)' { [Selector]::new($Matches[1], [SelectorType]::Css); break }
             Default { [Selector]::new($Expression) }
         }
         return $ret
@@ -65,13 +65,13 @@ class Selector {
     static Hidden [Object]GetSeleniumBy([string]$Expression, [SelectorType]$Type) {
         $local:SelectorObj =
         switch ($Type) {
-            'Id' { iex '[OpenQA.Selenium.By]::Id($Expression)' }
-            'Name' { iex '[OpenQA.Selenium.By]::Name($Expression)' }
-            'Tag' { iex '[OpenQA.Selenium.By]::TagName($Expression)' }
-            'ClassName' { iex '[OpenQA.Selenium.By]::ClassName($Expression)' }
-            'Link' { iex '[OpenQA.Selenium.By]::LinkText($Expression)' }
-            'XPath' { iex '[OpenQA.Selenium.By]::XPath($Expression)' }
-            'Css' { iex '[OpenQA.Selenium.By]::CssSelector($Expression)' }
+            'Id' { Invoke-Expression '[OpenQA.Selenium.By]::Id($Expression)'; break }
+            'Name' { Invoke-Expression '[OpenQA.Selenium.By]::Name($Expression)'; break }
+            'Tag' { Invoke-Expression '[OpenQA.Selenium.By]::TagName($Expression)'; break }
+            'ClassName' { Invoke-Expression '[OpenQA.Selenium.By]::ClassName($Expression)'; break }
+            'Link' { Invoke-Expression '[OpenQA.Selenium.By]::LinkText($Expression)'; break }
+            'XPath' { Invoke-Expression '[OpenQA.Selenium.By]::XPath($Expression)'; break }
+            'Css' { Invoke-Expression '[OpenQA.Selenium.By]::CssSelector($Expression)'; break }
             Default {
                 throw 'Undefined selector type'
             }
@@ -94,7 +94,7 @@ class SpecialKeys {
         if (!$this.KeyMap) { return '' }
         if ($this.KeyMap.ContainsKey($key)) {
             $tmp = $this.KeyMap.$key
-            return [string](iex '[OpenQA.Selenium.keys]::($tmp)')
+            return [string](Invoke-Expression '[OpenQA.Selenium.keys]::($tmp)')
         }
         else {
             return ('${{{0}}}' -f $key)
@@ -127,7 +127,7 @@ class PSWebDriver {
     #region Constructor:PSWebDriver
     PSWebDriver([string]$Browser) {
         $this.PSModuleRoot = Split-Path $PSScriptRoot -Parent
-        $this.InstanceId = [string]( -join ((1..4) | % { Get-Random -input ([char[]]((48..57) + (65..90) + (97..122))) })) #4-digits random id
+        $this.InstanceId = [string]( -join ((1..4) | ForEach-Object { Get-Random -input ([char[]]((48..57) + (65..90) + (97..122))) })) #4-digits random id
         $this.BrowserName = $Browser
         $this.StrictBrowserName = $this._ParseBrowserName($Browser)
         $this.DriverPackage = $this._ParseDriverPackage($Browser)
@@ -232,7 +232,7 @@ class PSWebDriver {
         if ($this.Driver) { $this.SetImplicitWait($this.ImplicitWait) }
 
         #Create Action instance
-        if ($this.Driver) { $this.Actions = iex '[OpenQA.Selenium.Interactions.Actions]::New($this.Driver)' }
+        if ($this.Driver) { $this.Actions = Invoke-Expression '[OpenQA.Selenium.Interactions.Actions]::New($this.Driver)' }
     }
 
     [void]Start([Uri]$URL) {
@@ -417,7 +417,7 @@ class PSWebDriver {
             }
             $private:Ret = $Value
             $private:regex = [regex]'\$\{KEY_.+?\}'
-            $regex.Matches($Value) | % {
+            $regex.Matches($Value) | ForEach-Object {
                 $Spec = $this.SpecialKeys.ConvertSeleniumKeys(($_.Value).SubString(2, ($_.Value.length - 3)))
                 $Ret = $Ret.Replace($_.Value, $Spec)
             }
@@ -767,8 +767,8 @@ class PSWebDriver {
                 New-Item $SaveFolder -ItemType Directory
             }
             #TODO:To alternate [System.Drawing.Image] class
-            iex '$ScreenShot = [OpenQA.Selenium.Screenshot]$this.Driver.GetScreenShot()'
-            iex '$ScreenShot.SaveAsFile($FileName, [OpenQA.Selenium.ScreenshotImageFormat]$ImageFormat)'
+            Invoke-Expression '$ScreenShot = [OpenQA.Selenium.Screenshot]$this.Driver.GetScreenShot()'
+            Invoke-Expression '$ScreenShot.SaveAsFile($FileName, [OpenQA.Selenium.ScreenshotImageFormat]$ImageFormat)'
         }
     }
 
@@ -844,8 +844,8 @@ class PSWebDriver {
 
     Hidden [string]_ParseBrowserName([string]$BrowserName) {
         [string]$local:tmp = switch ($BrowserName) {
-            "InternetExplorer" { "IE" }
-            "HeadlessChrome" { "Chrome" }
+            "InternetExplorer" { "IE"; break }
+            "HeadlessChrome" { "Chrome"; break }
             Default { $_ }
         }
         return $tmp
@@ -853,12 +853,12 @@ class PSWebDriver {
 
     Hidden [string]_ParseDriverPackage([string]$BrowserName) {
         [string]$local:tmp = switch ($BrowserName) {
-            "Firefox" { "GeckoDriver" }
-            "Edge" { "MicrosoftWebDriver" }
-            "IE" { "IEDriver" }
-            "InternetExplorer" { "IEDriver" }
-            "Chrome" { "ChromeDriver" }
-            "HeadlessChrome" { "ChromeDriver" }
+            "Firefox" { "GeckoDriver"; break }
+            "Edge" { "MicrosoftWebDriver"; break }
+            "IE" { "IEDriver"; break }
+            "InternetExplorer" { "IEDriver"; break }
+            "Chrome" { "ChromeDriver"; break }
+            "HeadlessChrome" { "ChromeDriver"; break }
             default { "${_}Driver" }
         }
         return $tmp
@@ -922,14 +922,17 @@ class PSWebDriver {
             '^regexp:(.+)' {
                 $ret.Matcher = 'RegExp'
                 $ret.Pattern = $Matches[1]
+                break
             }
             '^glob:(.+)' {
                 $ret.Matcher = 'Like'
                 $ret.Pattern = $Matches[1]
+                break
             }
             '^exact:(.+)' {
                 $ret.Matcher = 'Equal'
                 $ret.Pattern = $Matches[1]
+                break
             }
             Default {
                 $ret.Matcher = 'Like'
@@ -942,7 +945,7 @@ class PSWebDriver {
     Hidden [Object]_GetSelectElement([string]$Target) {
         if ($element = $this.FindElement($Target)) {
             $SelectElement = $null
-            iex '$SelectElement = New-Object "OpenQA.Selenium.Support.UI.SelectElement" $element' -ea Stop
+            Invoke-Expression '$SelectElement = New-Object "OpenQA.Selenium.Support.UI.SelectElement" $element' -ea Stop
             return $SelectElement
         }
         else {
@@ -958,7 +961,7 @@ class PSWebDriver {
         # Load AnimatedGifWrapper class
         $LibPath = Join-Path $this.PSModuleRoot '\Lib'
         if (!("AnimatedGifWrapper" -as [type])) {
-            $local:CSharpCode = gc (Join-Path $LibPath '\AnimatedGifWrapper\AnimatedGifWrapper.cs') -Raw -ea SilentlyContinue
+            $local:CSharpCode = Get-Content (Join-Path $LibPath '\AnimatedGifWrapper\AnimatedGifWrapper.cs') -Raw -ea SilentlyContinue
             $local:DllPath = Resolve-Path "$LibPath\AnimatedGif.*\lib\AnimatedGif.dll" -ea SilentlyContinue
             try {
                 if ($CSharpCode) {
