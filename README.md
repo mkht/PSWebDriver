@@ -58,6 +58,7 @@ $WebDriver = New-PSWebDriver -Name 'Chrome'
 |名前|型|説明|
 ----|----|----
 |Driver|未定義|WebDriverインスタンス<br>ラップされていないWebDriverネイティブのメソッドを利用したい場合に使えます|
+|BrowserOptions|OpenQA.Selenium.DriverOptions|ブラウザにオプションパラメータを指定する際に使用可能です|
 
 ----
 #### メソッド
