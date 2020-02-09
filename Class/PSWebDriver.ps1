@@ -108,11 +108,12 @@ class PSWebDriver {
     #region Public Properties
     $Driver
     $Actions
+    [ValidateSet('Chrome', 'Firefox', 'Edge', 'HeadlessChrome', 'HeadlessFirefox', 'IE', 'InternetExplorer')]
+    [string] $BrowserName
+    [OpenQA.Selenium.DriverOptions] $BrowserOptions
     #endregion
 
     #region Hidden properties
-    [ValidateSet('Chrome', 'Firefox', 'Edge', 'HeadlessChrome', 'HeadlessFirefox', 'IE', 'InternetExplorer')]
-    Hidden [string] $BrowserName
     Hidden [string] $InstanceId
     Hidden [SpecialKeys] $SpecialKeys
     Hidden [string] $StrictBrowserName
@@ -150,6 +151,7 @@ class PSWebDriver {
 
         $this._LoadSelenium()
         $this._LoadWebDriver()
+        $this.BrowserOptions = $this._NewDriverOptions($Browser)
     }
     #endregion
 
@@ -208,17 +210,6 @@ class PSWebDriver {
             $this.Quit()
         }
 
-        $Options = $null
-        # for Headless Chrome
-        if ($this.BrowserName -eq 'HeadlessChrome') {
-            $Options = New-Object OpenQA.Selenium.Chrome.ChromeOptions
-            $Options.AddArgument('--headless')
-        }
-        elseif ($this.BrowserName -eq 'HeadlessFirefox') {
-            $Options = New-Object OpenQA.Selenium.Firefox.FirefoxOptions
-            $Options.AddArgument('-headless')
-        }
-
         if ($this.StrictBrowserName -eq 'IE') {
             $local:tmp = 'OpenQA.Selenium.IE.InternetExplorerDriver'
         }
@@ -226,11 +217,11 @@ class PSWebDriver {
             $local:tmp = [string]('OpenQA.Selenium.{0}.{0}{1}' -f $this.StrictBrowserName, 'Driver')
         }
         #Start browser
-        if (!$Options) {
+        if ($null -eq $this.BrowserOptions) {
             $this.Driver = New-Object $tmp
         }
         else {
-            $this.Driver = New-Object $tmp($Options)
+            $this.Driver = New-Object $tmp($this.BrowserOptions)
         }
         #Set default implicit wait
         if ($this.Driver) { $this.SetImplicitWait($this.ImplicitWait) }
@@ -868,6 +859,48 @@ class PSWebDriver {
             default { "${_}Driver" }
         }
         return $tmp
+    }
+
+    Hidden [OpenQA.Selenium.DriverOptions]_NewDriverOptions([string]$BrowserName) {
+        $Options = $null
+
+        switch ($BrowserName) {
+            'Firefox' {
+                $Options = New-Object OpenQA.Selenium.Firefox.FirefoxOptions
+                break
+            }
+            'HeadlessFirefox' {
+                $Options = New-Object OpenQA.Selenium.Firefox.FirefoxOptions
+                $Options.AddArgument('-headless')
+                break
+            }
+            'Edge' {
+                $Options = New-Object OpenQA.Selenium.Edge.EdgeOptions
+                break
+            }
+            'IE' {
+                $Options = New-Object OpenQA.Selenium.IE.InternetExplorerOptions
+                break
+            }
+            'InternetExplorer' {
+                $Options = New-Object OpenQA.Selenium.IE.InternetExplorerOptions
+                break
+            }
+            'Chrome' {
+                $Options = New-Object OpenQA.Selenium.Chrome.ChromeOptions
+                break
+            }
+            'HeadlessChrome' {
+                $Options = New-Object OpenQA.Selenium.Chrome.ChromeOptions
+                $Options.AddArgument('--headless')
+                break
+            }
+            default {
+                $Options = $null
+            }
+        }
+        
+        return $Options
     }
 
     Hidden [void]_WarnBrowserNotStarted([string]$Message) {
