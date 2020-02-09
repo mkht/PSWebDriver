@@ -502,6 +502,33 @@ InModuleScope PSWebDriver {
                 $Driver.StopAnimationRecord()
             }
         }
+
+        Describe 'Miscellaneous Tests' {
+            Context 'BrowserOption: AcceptInsecureCertificates' {
+
+                BeforeAll {
+                    $Driver.Quit()
+                }
+
+                AfterEach {
+                    $Driver.Quit()
+                }
+
+                It 'Accept Certificate Errors' {
+                    $TestURL = 'https://expired.badssl.com/'
+                    $Driver.BrowserOptions.AcceptInsecureCertificates = $true
+                    { $Driver.Start($TestURL) } | Should -Not -Throw
+                    $Driver.IsElementPresent('id=content') | Should -BeTrue
+                }
+
+                It 'DO NOT Accept Certificate Errors' {
+                    $TestURL = 'https://expired.badssl.com/'
+                    $Driver.BrowserOptions.AcceptInsecureCertificates = $false
+                    try { $Driver.Start($TestURL) }catch { } # Whether an exception raises depend on the browser (Firefox will throw, but Chrome will not.)
+                    $Driver.IsElementPresent('id=content') | Should -BeFalse
+                }
+            }
+        }
     }
     finally {
         # Finalize
