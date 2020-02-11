@@ -84,7 +84,11 @@ $WebDriver = New-PSWebDriver -Name 'Chrome'
 ----|----|----
 |FindElement([string]$SelectorExpression)|Object|`$SelectorExpression`で指定されるページ内の要素を取得します|
 |IsElementPresent([string]$SelectorExpression)|bool|`$SelectorExpression`で指定される要素が存在するか確認します|
+|GetText([string]$SelectorExpression)|string|`$SelectorExpression`で指定される要素のinnerTextを取得します|
+|GetAttribute([string]$SelectorExpression, [string]$Attribute)|string|`$SelectorExpression`で指定される要素内の`$Attribute`属性値を取得します|
+|GetAttribute([string]$SelectorExpression, [string]$Attribute)|string|`$SelectorExpression`で指定される要素内の`$Attribute`属性値を取得します|
 |GetTitle()|string|現在開いているページタイトルを取得します|
+|GetLocation()|string|現在開いているページURLを取得します|
 |IsAlertPresent()|bool|アラートが表示されているか確認します|
 
 ##### 操作
@@ -93,6 +97,8 @@ $WebDriver = New-PSWebDriver -Name 'Chrome'
 |SendKeys([string]$Target, [string]$Value)|void|`$Target`(SelectorExpression)で指定される要素に対して`$Value`を入力します<br>特殊キーの送信については下部の「特殊キーの入力について」を参照してください|
 |ClearAndType([string]$Target, [string]$Value)|void|`$Target`(SelectorExpression)で指定される要素に対して`$Value`を入力します<br>既存の内容をクリアしてから入力する点が`SendKeys()`との違いです<br>(Selenium IDEの`Type`コマンドに相当します)|
 |Click([string]$Target)|void|`$Target`(SelectorExpression)で指定される要素をクリックします|
+|DoubleClick([string]$Target)|void|`$Target`(SelectorExpression)で指定される要素をダブルクリックします|
+|RightClick([string]$Target)|void|`$Target`(SelectorExpression)で指定される要素を右クリックします|
 |Select([string]$Target, [string]$Value)|void|`$Target`(SelectorExpression)で指定されるSelect要素から`$Value`をテキストに持つ要素を選択します|
 |CloseAlert()|void|アラートを閉じます|
 |CloseAlertAndGetText([bool]$Accept)|string|アラートテキストを取得し、アラートを閉じます<br>`$Accept`でアラートに対する`OK` or `Cancel`を指定できます|
