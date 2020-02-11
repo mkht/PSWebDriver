@@ -505,12 +505,7 @@ InModuleScope PSWebDriver {
 
         Describe 'Miscellaneous Tests' {
             Context 'BrowserOption: AcceptInsecureCertificates' {
-
-                BeforeAll {
-                    $Driver.Quit()
-                }
-
-                AfterEach {
+                BeforeEach {
                     $Driver.Quit()
                 }
 
