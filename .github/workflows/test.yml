@@ -13,7 +13,7 @@ jobs:
       run: Install-Module Pester -Force -AllowClobber -Scope CurrentUser
     - name: Collect environment variables
       run: |
-      Get-ChildItem 'env:' | Format-Table -AutoSize -Wrap
-      Get-Module -ListAvailable
+        Get-ChildItem 'env:' | Format-Table -AutoSize -Wrap
+        Get-Module -ListAvailable
     - name: Invoke-Pester
       run: Invoke-Pester
