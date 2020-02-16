@@ -86,7 +86,6 @@ $WebDriver = New-PSWebDriver -Name 'Chrome'
 |IsElementPresent([string]$SelectorExpression)|bool|`$SelectorExpression`で指定される要素が存在するか確認します|
 |GetText([string]$SelectorExpression)|string|`$SelectorExpression`で指定される要素のinnerTextを取得します|
 |GetAttribute([string]$SelectorExpression, [string]$Attribute)|string|`$SelectorExpression`で指定される要素内の`$Attribute`属性値を取得します|
-|GetAttribute([string]$SelectorExpression, [string]$Attribute)|string|`$SelectorExpression`で指定される要素内の`$Attribute`属性値を取得します|
 |GetTitle()|string|現在開いているページタイトルを取得します|
 |GetLocation()|string|現在開いているページURLを取得します|
 |IsAlertPresent()|bool|アラートが表示されているか確認します|
