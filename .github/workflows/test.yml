@@ -1,0 +1,15 @@
+name: BrowserAutomationTest
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Collect environment variables
+      run: Get-ChildItem 'env:'
+    - name: Invoke-Pester
+      run: Invoke-Pester
