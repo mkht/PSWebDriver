@@ -1,6 +1,6 @@
 name: BrowserAutomationTest
 
-on: [push, pull_request]
+on: [push]
 
 jobs:
   build:
@@ -9,7 +9,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Install Pester
+      run: Install-Module Pester -Force -AllowClobber -Scope CurrentUser
     - name: Collect environment variables
-      run: Get-ChildItem 'env:'
+      run: |
+      Get-ChildItem 'env:' | Format-Table -AutoSize -Wrap
+      Get-Module -ListAvailable
     - name: Invoke-Pester
       run: Invoke-Pester
