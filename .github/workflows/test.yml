@@ -11,9 +11,13 @@ jobs:
     - uses: actions/checkout@v2
     - name: Install Pester
       run: Install-Module Pester -Force -AllowClobber -Scope CurrentUser
-    - name: Collect environment variables
+      shell: powershell
+    - name: Collect environment
       run: |
+        $PSVersionTable
         Get-ChildItem 'env:' | Format-Table -AutoSize -Wrap
         Get-Module -ListAvailable
+      shell: powershell
     - name: Invoke-Pester
       run: Invoke-Pester
+      shell: powershell
