@@ -1009,7 +1009,7 @@ class PSWebDriver {
                 }
             }
             catch {
-                throw "Couldn't load AnimatedGifWrapper Class"
+                throw
             }
         }
 
