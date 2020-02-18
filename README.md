@@ -78,6 +78,7 @@ $WebDriver = New-PSWebDriver -Name 'Chrome'
 |GetWindowSize()|System.Drawing.Size|ブラウザのウィンドウサイズを取得します|
 |SetWindowSize([System.Drawing.Size]$Size)|void|ブラウザのウィンドウサイズを変更します|
 |SetWindowSize([int]$Width,[int]$Height)|void|ブラウザのウィンドウサイズを変更します|
+|GetBrowserInfo()|HashTable|起動中ブラウザの名前、バージョン、プラットフォーム情報を取得します|
 
 ##### 要素検索 / 情報取得
 |名前|戻り値型|説明|

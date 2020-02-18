@@ -126,6 +126,16 @@ InModuleScope PSWebDriver {
             }
         }
 
+        Describe 'GetBrowserInfo()' {
+            It 'Return Browser Information' {
+                $local:Ret = $Driver.GetBrowserInfo()
+                $local:Ret | Should -BeOfType 'HashTable'
+                $local:Ret.browserName | Should -Not -BeNullOrEmpty
+                $local:Ret.browserVersion | Should -Not -BeNullOrEmpty
+                $local:Ret.platformName | Should -Not -BeNullOrEmpty
+            }
+        }
+
         Describe 'GetTitle()' {
             It 'Return Page title' {
                 $Driver.GetTitle() | Should -Be 'Test page for PSWebDriver'

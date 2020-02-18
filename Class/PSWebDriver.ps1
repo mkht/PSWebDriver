@@ -293,6 +293,24 @@ class PSWebDriver {
     }
     #endregion
 
+    #region Method:GetBrowserInfo()
+    [HashTable]GetBrowserInfo() {
+        if (!$this.Driver) {
+            $this._WarnBrowserNotStarted()
+            return $null
+        }
+        else {
+            $AllInfo = $this.Driver.Capabilities.ToDictionary()
+            $ReturnInfo = @{
+                browserName    = $AllInfo.browserName
+                browserVersion = $AllInfo.browserVersion
+                platformName   = $AllInfo.platformName
+            }
+            return $ReturnInfo
+        }
+    }
+    #endregion
+
     #region Method:GetTitle()
     [string]GetTitle() {
         if (!$this.Driver) {
@@ -1009,7 +1027,7 @@ class PSWebDriver {
                 }
             }
             catch {
-                throw "Couldn't load AnimatedGifWrapper Class"
+                throw
             }
         }
 
