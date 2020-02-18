@@ -522,10 +522,6 @@ InModuleScope PSWebDriver {
                     try { $Driver.Start($TestURL) }catch { } # Whether an exception raises depend on the browser (Firefox will throw, but Chrome will not.)
                     $Driver.IsElementPresent('id=content') | Should -BeFalse
                 }
-
-                It 'FAIL' {
-                    $false | Should -BeTrue
-                }
             }
         }
     }
