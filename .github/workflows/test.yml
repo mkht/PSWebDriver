@@ -1,0 +1,23 @@
+name: BrowserAutomationTest
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install Pester
+      run: Install-Module Pester -Force -AllowClobber -Scope CurrentUser
+      shell: powershell
+    - name: Collect environment
+      run: |
+        $PSVersionTable
+        Get-ChildItem 'env:' | Format-Table -AutoSize -Wrap
+        Get-Module -ListAvailable
+      shell: powershell
+    - name: Invoke-Pester
+      run: Invoke-Pester -EnableExit
+      shell: powershell
