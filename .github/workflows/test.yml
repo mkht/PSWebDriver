@@ -14,10 +14,13 @@ jobs:
       shell: powershell
     - name: Collect environment
       run: |
+        Write-Host '$PSVersionTable'
         $PSVersionTable
+        Write-Host '$env:'
         Get-ChildItem 'env:' | Format-Table -AutoSize -Wrap
+        Write-Host 'Module List:'
         Get-Module -ListAvailable
       shell: powershell
     - name: Invoke-Pester
-      run: Invoke-Pester
+      run: Invoke-Pester -EnableExit
       shell: powershell
