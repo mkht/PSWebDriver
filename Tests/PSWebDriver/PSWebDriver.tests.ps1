@@ -4,8 +4,15 @@
 ###################################>
 
 #Requires -Version 5.0
-#Requires -Modules @{ ModuleName="Pester"; ModuleVersion="4.1.0" }
+#Requires -Modules @{ ModuleName="Pester"; ModuleVersion="4.10.0" }
 
+# Specify Browser
+if (-not $env:TARGET_BROWSER) {
+    $global:Browser = 'Chrome'
+}
+else {
+    $global:Browser = $env:TARGET_BROWSER
+}
 
 # Define Pester custom assertions
 function ThrowWithName([scriptblock]$ActualValue, [switch]$Negate, [string]$Name) {
@@ -68,7 +75,7 @@ InModuleScope PSWebDriver {
         #Initialize
         $script:moduleRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
         $script:TestData = Join-Path $script:moduleRoot '\Tests\TestData\index.html'
-        $Driver = New-PSWebDriver -Name 'Chrome'
+        $Driver = New-PSWebDriver -Name $global:Browser
         $Driver.Start($script:TestData)
 
         # Tests
@@ -248,6 +255,10 @@ InModuleScope PSWebDriver {
             }
 
             It 'Input Single special key "${KEY_N1}", Expect "1"' {
+                if ($global:Browser -match 'Firefox') {
+                    Set-ItResult -Skipped -Because 'Firefox does not recognize NumberPad keys'
+                }
+
                 $Driver.SendKeys('name=first_name', '${KEY_N1}')
                 $Driver.GetAttribute('name=first_name', 'value') | Should -Be '1'
             }
@@ -258,11 +269,19 @@ InModuleScope PSWebDriver {
             }
 
             It 'Input multiple special keys "${KEY_MULTIPLY}${KEY_SEPARATOR}${KEY_N7}${KEY_N7}", Expect "*,77"' {
+                if ($global:Browser -match 'Firefox') {
+                    Set-ItResult -Skipped -Because 'Firefox does not recognize NumberPad keys'
+                }
+
                 $Driver.SendKeys('name=first_name', '${KEY_MULTIPLY}${KEY_SEPARATOR}${KEY_N7}${KEY_N7}')
                 $Driver.GetAttribute('name=first_name', 'value') | Should -Be '*,77'
             }
 
             It 'Input complex string with multiple special keys "H+${KEY_}llo${KEY_N7}${KEY_N7}@.comA${KEY_BKSP}", Expect "H+${KEY_}llo77@.com"' {
+                if ($global:Browser -match 'Firefox') {
+                    Set-ItResult -Skipped -Because 'Firefox does not recognize NumberPad keys'
+                }
+
                 $Driver.SendKeys('name=first_name', 'H+${KEY_}llo${KEY_N7}${KEY_N7}@.comA${KEY_BKSP}')
                 $Driver.GetAttribute('name=first_name', 'value') | Should -Be 'H+${KEY_}llo77@.com'
             }
@@ -520,6 +539,10 @@ InModuleScope PSWebDriver {
                 }
 
                 It 'Accept Certificate Errors' {
+                    if ($global:Browser -match 'Edge') {
+                        Set-ItResult -Skipped -Because 'This test throws an exception on Legacy Edge (Investigating)'
+                    }
+
                     $TestURL = 'https://expired.badssl.com/'
                     $Driver.BrowserOptions.AcceptInsecureCertificates = $true
                     { $Driver.Start($TestURL) } | Should -Not -Throw
@@ -527,6 +550,10 @@ InModuleScope PSWebDriver {
                 }
 
                 It 'DO NOT Accept Certificate Errors' {
+                    if ($global:Browser -match 'Firefox') {
+                        Set-ItResult -Skipped -Because 'This test freezes sometimes on Firefox (Investigating)'
+                    }
+
                     $TestURL = 'https://expired.badssl.com/'
                     $Driver.BrowserOptions.AcceptInsecureCertificates = $false
                     try { $Driver.Start($TestURL) }catch { } # Whether an exception raises depend on the browser (Firefox will throw, but Chrome will not.)
@@ -542,5 +569,8 @@ InModuleScope PSWebDriver {
             $Driver.Quit()
             $Driver = $null
         }
+
+        # Remove global variables
+        Remove-Variable -Name Browser -Scope global -ErrorAction Ignore
     }
 }
