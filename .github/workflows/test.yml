@@ -22,6 +22,10 @@ jobs:
       if: contains(matrix.browser, 'Firefox')
       run: echo "##[add-path]$env:GeckoWebDriver"
 
+    - name: Install Legacy Edge Driver
+      if: contains(matrix.browser, 'Edge')
+      run: DISM.exe /Online /Add-Capability /CapabilityName:Microsoft.WebDriver~~~~0.0.1.0
+
     - name: Collect environment
       run: |
         $PSVersionTable
