@@ -540,7 +540,7 @@ InModuleScope PSWebDriver {
 
                 It 'Accept Certificate Errors' {
                     if ($global:Browser -match 'Edge') {
-                        Set-ItResult -Skipped -Because 'This test throws an exception on Legacy Edge (Investigating)'
+                        Set-ItResult -Skipped -Because 'Legacy Edge does not support "AcceptInsecureCertificates" option'
                     }
 
                     $TestURL = 'https://expired.badssl.com/'
