@@ -19,11 +19,7 @@ jobs:
 
     - name: Add GeckDriver to the PATH
       if: contains(matrix.browser, 'Firefox')
-      run: |
-        $env:Path += ";$env:GeckoWebDriver"
-        [Environment]::SetEnvironmentVariable('PATH', $env:Path, 'Machine')
-        $env:Path
-      shell: powershell
+      run: echo "##[add-path]$env:GeckoWebDriver"
 
     - name: Collect environment
       run: |
