@@ -3,12 +3,13 @@ name: BrowserAutomationTest
 on: [push]
 
 jobs:
-  build:
+  test:
     runs-on: windows-latest
 
     strategy:
       matrix:
-        browser: [chrome, firefox]
+        browser: [chrome, firefox, Edge]
+      fail-fast: false
 
     steps:
     - uses: actions/checkout@v2
