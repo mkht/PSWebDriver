@@ -1,5 +1,7 @@
 # PSWebDriver
 
+![BrowserAutomationTest](https://github.com/mkht/PSWebDriver/workflows/BrowserAutomationTest/badge.svg)
+
 Selenium WebDriverをPowerShellから使用しやすくするラッパークラス+便利な関数群
 
 
