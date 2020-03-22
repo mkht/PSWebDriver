@@ -18,10 +18,6 @@ jobs:
       run: Install-Module Pester -Force -AllowClobber -Scope CurrentUser -SkipPublisherCheck
       shell: powershell
 
-    - name: Add GeckDriver to the PATH
-      if: contains(matrix.browser, 'Firefox')
-      run: echo "##[add-path]$env:GeckoWebDriver"
-
     - name: Collect environment
       run: |
         $PSVersionTable
