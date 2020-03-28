@@ -86,6 +86,7 @@ $WebDriver = New-PSWebDriver -Name 'Chrome'
 |名前|戻り値型|説明|
 ----|----|----
 |FindElement([string]$SelectorExpression)|Object|`$SelectorExpression`で指定されるページ内の要素を取得します|
+|FindElements([string]$SelectorExpression)|Object[]|`$SelectorExpression`にマッチする全ての要素を取得します|
 |IsElementPresent([string]$SelectorExpression)|bool|`$SelectorExpression`で指定される要素が存在するか確認します|
 |GetText([string]$SelectorExpression)|string|`$SelectorExpression`で指定される要素のinnerTextを取得します|
 |GetAttribute([string]$SelectorExpression, [string]$Attribute)|string|`$SelectorExpression`で指定される要素内の`$Attribute`属性値を取得します|
