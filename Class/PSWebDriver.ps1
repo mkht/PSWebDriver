@@ -1018,12 +1018,26 @@ class PSWebDriver {
         # Load AnimatedGifWrapper class
         $LibPath = Join-Path $this.PSModuleRoot '\Lib'
         if (!('AnimatedGifWrapper' -as [type])) {
-            $local:CSharpCode = Get-Content (Join-Path $LibPath '\AnimatedGifWrapper\AnimatedGifWrapper.cs') -Raw -ea SilentlyContinue
-            $local:DllPath = Resolve-Path "$LibPath\AnimatedGif.*\lib\AnimatedGif.dll" -ea SilentlyContinue
+            switch ($global:PSEdition) {
+                'Core' {
+                    #PowerShell >= 7.0
+                    $local:DllPath = Resolve-Path "$LibPath\AnimatedGif.1.0.5\lib\AnimatedGif.dll" -ea SilentlyContinue
+                    $local:WrapperPath = Resolve-Path "$LibPath\AnimatedGifWrapper\PowerShell\AnimatedGifWrapper.dll" -ea SilentlyContinue
+                    break
+                }
+                Default {
+                    #PowerShell <= 5.1
+                    $local:DllPath = Resolve-Path "$LibPath\AnimatedGif.1.0.2\lib\AnimatedGif.dll" -ea SilentlyContinue
+                    $local:CSharpCode = Get-Content (Join-Path $LibPath '\AnimatedGifWrapper\WindowsPowerShell\AnimatedGifWrapper.cs') -Raw -ea SilentlyContinue
+                }
+            }
             try {
-                if ($CSharpCode) {
-                    [void][Reflection.assembly]::LoadFrom($DllPath.ToString())
-                    Add-Type -Language CSharp -TypeDefinition $CSharpCode -ReferencedAssemblies ('System.Drawing', 'System.Windows.Forms', $DllPath.ToString()) -ea Stop
+                [void][Reflection.assembly]::LoadFrom($local:DllPath.ToString())
+                if ($local:WrapperPath) {
+                    [void][Reflection.assembly]::LoadFrom($local:WrapperPath.ToString())
+                }
+                elseif ($local:CSharpCode) {
+                    Add-Type -Language CSharp -TypeDefinition $local:CSharpCode -ReferencedAssemblies ('System.Drawing', 'System.Windows.Forms', $local:DllPath.ToString()) -ea Stop
                 }
             }
             catch {

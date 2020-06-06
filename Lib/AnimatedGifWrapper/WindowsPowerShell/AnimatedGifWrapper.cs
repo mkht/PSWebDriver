@@ -9,8 +9,8 @@ using AnimatedGif;
 // //////////////////////////////////////////
 // Summary: PSWebDriverからAnimatedGifライブラリを使うためのラッパークラス
 // Author : mkht
-// Date   : 2018/01/01
-// License: Copyright (c) 2018 mkht
+// Date   : 2020/06/07
+// License: Copyright (c) 2020 mkht
 //          Released under the MIT license
 //          http://opensource.org/licenses/mit-license.php
 // //////////////////////////////////////////
@@ -53,7 +53,7 @@ public class AnimatedGifWrapper
         using (AnimatedGifCreator gifCreator = AnimatedGif.AnimatedGif.Create(savePath, delay, 1)) { //NoRepeat
             foreach (MemoryStream frame in this.ImageList) {
                 using (Image img = (Image)Decompress(frame)){
-                    gifCreator.AddFrame(img, GifQuality.Default);
+                    gifCreator.AddFrame(img, delay, GifQuality.Default);
                     frame.Dispose();
                 }
             }
