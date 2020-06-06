@@ -12,7 +12,7 @@
     RootModule        = 'PSWebDriver.psm1'
 
     # このモジュールのバージョン番号です。
-    ModuleVersion     = '0.0.2'
+    ModuleVersion     = '0.0.3'
 
     # サポートされている PSEditions
     # CompatiblePSEditions = @()

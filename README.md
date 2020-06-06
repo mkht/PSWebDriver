@@ -23,6 +23,9 @@ https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/
 https://selenium.dev/downloads/  
 ※Internet Explorerを使用する場合、[追加の設定](https://github.com/SeleniumHQ/selenium/wiki/InternetExplorerDriver#required-configuration)が必要ですのでご注意ください
 
+## 対応プラットフォーム
++ Windows PowerShell 5.1
++ PowerShell 7.0 or later (Only on Windows)
 
 ## 使い方
 
@@ -61,6 +64,7 @@ $WebDriver = New-PSWebDriver -Name 'Chrome'
 ----|----|----
 |Driver|未定義|WebDriverインスタンス<br>ラップされていないWebDriverネイティブのメソッドを利用したい場合に使えます|
 |BrowserOptions|OpenQA.Selenium.DriverOptions|ブラウザにオプションパラメータを指定する際に使用可能です|
+|DriverService|OpenQA.Selenium.DriverService|ブラウザにオプションパラメータを指定する際に使用可能です|
 
 ----
 #### メソッド
