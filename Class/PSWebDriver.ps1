@@ -111,6 +111,7 @@ class PSWebDriver {
     [ValidateSet('Chrome', 'Firefox', 'Edge', 'HeadlessChrome', 'HeadlessFirefox', 'IE', 'InternetExplorer')]
     [string] $BrowserName
     [OpenQA.Selenium.DriverOptions] $BrowserOptions
+    [OpenQA.Selenium.DriverService] $DriverService
     #endregion
 
     #region Hidden properties
@@ -152,6 +153,7 @@ class PSWebDriver {
         $this._LoadSelenium()
         $this._LoadWebDriver()
         $this.BrowserOptions = $this._NewDriverOptions($Browser)
+        $this.DriverService = $this._NewDriverService($Browser)
     }
     #endregion
 
@@ -216,13 +218,25 @@ class PSWebDriver {
         else {
             $local:tmp = [string]('OpenQA.Selenium.{0}.{0}{1}' -f $this.StrictBrowserName, 'Driver')
         }
+
         #Start browser
         if ($null -eq $this.BrowserOptions) {
-            $this.Driver = New-Object $tmp
+            if ($null -eq $this.DriverService) {
+                $this.Driver = New-Object $tmp
+            }
+            else {
+                $this.Driver = New-Object $tmp($this.DriverService)
+            }
         }
         else {
-            $this.Driver = New-Object $tmp($this.BrowserOptions)
+            if ($null -eq $this.DriverService) {
+                $this.Driver = New-Object $tmp($this.BrowserOptions)
+            }
+            else {
+                $this.Driver = New-Object $tmp($this.DriverService, $this.BrowserOptions)
+            }
         }
+
         #Set default implicit wait
         if ($this.Driver) { $this.SetImplicitWait($this.ImplicitWait) }
 
@@ -919,6 +933,48 @@ class PSWebDriver {
         }
         
         return $Options
+    }
+
+    Hidden [OpenQA.Selenium.DriverService]_NewDriverService([string]$BrowserName) {
+        $Service = $null
+
+        switch ($BrowserName) {
+            'Firefox' {
+                $Service = [OpenQA.Selenium.Firefox.FirefoxDriverService]::CreateDefaultService()
+                if ($global:PSEdition -eq 'Core') { $Service.Host = '::1' } # Workaround for performance issue of the Firefox on .NET Core
+                break
+            }
+            'HeadlessFirefox' {
+                $Service = [OpenQA.Selenium.Firefox.FirefoxDriverService]::CreateDefaultService()
+                if ($global:PSEdition -eq 'Core') { $Service.Host = '::1' }
+                break
+            }
+            'Edge' {
+                $Service = [OpenQA.Selenium.Edge.EdgeDriverService]::CreateDefaultService()
+                break
+            }
+            'IE' {
+                $Service = [OpenQA.Selenium.IE.InternetExplorerDriverService]::CreateDefaultService()
+                break
+            }
+            'InternetExplorer' {
+                $Service = [OpenQA.Selenium.IE.InternetExplorerDriverService]::CreateDefaultService()
+                break
+            }
+            'Chrome' {
+                $Service = [OpenQA.Selenium.Chrome.ChromeDriverService]::CreateDefaultService()
+                break
+            }
+            'HeadlessChrome' {
+                $Service = [OpenQA.Selenium.Chrome.ChromeDriverService]::CreateDefaultService()
+                break
+            }
+            default {
+                $Service = $null
+            }
+        }
+        
+        return $Service
     }
 
     Hidden [void]_WarnBrowserNotStarted([string]$Message) {
