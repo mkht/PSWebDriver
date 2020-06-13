@@ -65,13 +65,13 @@ class Selector {
     static Hidden [Object]GetSeleniumBy([string]$Expression, [SelectorType]$Type) {
         $local:SelectorObj =
         switch ($Type) {
-            'Id' { Invoke-Expression '[OpenQA.Selenium.By]::Id($Expression)'; break }
-            'Name' { Invoke-Expression '[OpenQA.Selenium.By]::Name($Expression)'; break }
-            'Tag' { Invoke-Expression '[OpenQA.Selenium.By]::TagName($Expression)'; break }
-            'ClassName' { Invoke-Expression '[OpenQA.Selenium.By]::ClassName($Expression)'; break }
-            'Link' { Invoke-Expression '[OpenQA.Selenium.By]::LinkText($Expression)'; break }
-            'XPath' { Invoke-Expression '[OpenQA.Selenium.By]::XPath($Expression)'; break }
-            'Css' { Invoke-Expression '[OpenQA.Selenium.By]::CssSelector($Expression)'; break }
+            'Id' { Invoke-Expression '[By]::Id($Expression)'; break }
+            'Name' { Invoke-Expression '[By]::Name($Expression)'; break }
+            'Tag' { Invoke-Expression '[By]::TagName($Expression)'; break }
+            'ClassName' { Invoke-Expression '[By]::ClassName($Expression)'; break }
+            'Link' { Invoke-Expression '[By]::LinkText($Expression)'; break }
+            'XPath' { Invoke-Expression '[By]::XPath($Expression)'; break }
+            'Css' { Invoke-Expression '[By]::CssSelector($Expression)'; break }
             Default {
                 throw 'Undefined selector type'
             }
@@ -94,7 +94,7 @@ class SpecialKeys {
         if (!$this.KeyMap) { return '' }
         if ($this.KeyMap.ContainsKey($key)) {
             $tmp = $this.KeyMap.$key
-            return [string](Invoke-Expression '[OpenQA.Selenium.keys]::($tmp)')
+            return [string](Invoke-Expression '[keys]::($tmp)')
         }
         else {
             return ('${{{0}}}' -f $key)
@@ -110,8 +110,8 @@ class PSWebDriver {
     $Actions
     [ValidateSet('Chrome', 'Firefox', 'Edge', 'HeadlessChrome', 'HeadlessFirefox', 'IE', 'InternetExplorer')]
     [string] $BrowserName
-    [OpenQA.Selenium.DriverOptions] $BrowserOptions
-    [OpenQA.Selenium.DriverService] $DriverService
+    [DriverOptions] $BrowserOptions
+    [DriverService] $DriverService
     #endregion
 
     #region Hidden properties
@@ -213,10 +213,10 @@ class PSWebDriver {
         }
 
         if ($this.StrictBrowserName -eq 'IE') {
-            $local:tmp = 'OpenQA.Selenium.IE.InternetExplorerDriver'
+            $local:tmp = 'IE.InternetExplorerDriver'
         }
         else {
-            $local:tmp = [string]('OpenQA.Selenium.{0}.{0}{1}' -f $this.StrictBrowserName, 'Driver')
+            $local:tmp = [string]('{0}.{0}{1}' -f $this.StrictBrowserName, 'Driver')
         }
 
         #Start browser
@@ -241,7 +241,7 @@ class PSWebDriver {
         if ($this.Driver) { $this.SetImplicitWait($this.ImplicitWait) }
 
         #Create Action instance
-        if ($this.Driver) { $this.Actions = Invoke-Expression '[OpenQA.Selenium.Interactions.Actions]::New($this.Driver)' }
+        if ($this.Driver) { $this.Actions = Invoke-Expression '[Interactions.Actions]::New($this.Driver)' }
     }
 
     [void]Start([Uri]$URL) {
@@ -794,8 +794,8 @@ class PSWebDriver {
                 New-Item $SaveFolder -ItemType Directory
             }
             #TODO:To alternate [System.Drawing.Image] class
-            Invoke-Expression '$ScreenShot = [OpenQA.Selenium.Screenshot]$this.Driver.GetScreenShot()'
-            Invoke-Expression '$ScreenShot.SaveAsFile($FileName, [OpenQA.Selenium.ScreenshotImageFormat]$ImageFormat)'
+            Invoke-Expression '$ScreenShot = [Screenshot]$this.Driver.GetScreenShot()'
+            Invoke-Expression '$ScreenShot.SaveAsFile($FileName, [ScreenshotImageFormat]$ImageFormat)'
         }
     }
 
@@ -893,37 +893,37 @@ class PSWebDriver {
         return $tmp
     }
 
-    Hidden [OpenQA.Selenium.DriverOptions]_NewDriverOptions([string]$BrowserName) {
+    Hidden [DriverOptions]_NewDriverOptions([string]$BrowserName) {
         $Options = $null
 
         switch ($BrowserName) {
             'Firefox' {
-                $Options = New-Object OpenQA.Selenium.Firefox.FirefoxOptions
+                $Options = New-Object Firefox.FirefoxOptions
                 break
             }
             'HeadlessFirefox' {
-                $Options = New-Object OpenQA.Selenium.Firefox.FirefoxOptions
+                $Options = New-Object Firefox.FirefoxOptions
                 $Options.AddArgument('-headless')
                 break
             }
             'Edge' {
-                $Options = New-Object OpenQA.Selenium.Edge.EdgeOptions
+                $Options = New-Object Edge.EdgeOptions
                 break
             }
             'IE' {
-                $Options = New-Object OpenQA.Selenium.IE.InternetExplorerOptions
+                $Options = New-Object IE.InternetExplorerOptions
                 break
             }
             'InternetExplorer' {
-                $Options = New-Object OpenQA.Selenium.IE.InternetExplorerOptions
+                $Options = New-Object IE.InternetExplorerOptions
                 break
             }
             'Chrome' {
-                $Options = New-Object OpenQA.Selenium.Chrome.ChromeOptions
+                $Options = New-Object Chrome.ChromeOptions
                 break
             }
             'HeadlessChrome' {
-                $Options = New-Object OpenQA.Selenium.Chrome.ChromeOptions
+                $Options = New-Object Chrome.ChromeOptions
                 $Options.AddArgument('--headless')
                 break
             }
@@ -935,38 +935,38 @@ class PSWebDriver {
         return $Options
     }
 
-    Hidden [OpenQA.Selenium.DriverService]_NewDriverService([string]$BrowserName) {
+    Hidden [DriverService]_NewDriverService([string]$BrowserName) {
         $Service = $null
 
         switch ($BrowserName) {
             'Firefox' {
-                $Service = [OpenQA.Selenium.Firefox.FirefoxDriverService]::CreateDefaultService()
+                $Service = [Firefox.FirefoxDriverService]::CreateDefaultService()
                 if ($global:PSEdition -eq 'Core') { $Service.Host = '::1' } # Workaround for performance issue of the Firefox on .NET Core
                 break
             }
             'HeadlessFirefox' {
-                $Service = [OpenQA.Selenium.Firefox.FirefoxDriverService]::CreateDefaultService()
+                $Service = [Firefox.FirefoxDriverService]::CreateDefaultService()
                 if ($global:PSEdition -eq 'Core') { $Service.Host = '::1' }
                 break
             }
             'Edge' {
-                $Service = [OpenQA.Selenium.Edge.EdgeDriverService]::CreateDefaultService()
+                $Service = [Edge.EdgeDriverService]::CreateDefaultService()
                 break
             }
             'IE' {
-                $Service = [OpenQA.Selenium.IE.InternetExplorerDriverService]::CreateDefaultService()
+                $Service = [IE.InternetExplorerDriverService]::CreateDefaultService()
                 break
             }
             'InternetExplorer' {
-                $Service = [OpenQA.Selenium.IE.InternetExplorerDriverService]::CreateDefaultService()
+                $Service = [IE.InternetExplorerDriverService]::CreateDefaultService()
                 break
             }
             'Chrome' {
-                $Service = [OpenQA.Selenium.Chrome.ChromeDriverService]::CreateDefaultService()
+                $Service = [Chrome.ChromeDriverService]::CreateDefaultService()
                 break
             }
             'HeadlessChrome' {
-                $Service = [OpenQA.Selenium.Chrome.ChromeDriverService]::CreateDefaultService()
+                $Service = [Chrome.ChromeDriverService]::CreateDefaultService()
                 break
             }
             default {
@@ -1058,7 +1058,7 @@ class PSWebDriver {
     Hidden [Object]_GetSelectElement([string]$Target) {
         if ($element = $this.FindElement($Target)) {
             $SelectElement = $null
-            Invoke-Expression '$SelectElement = New-Object "OpenQA.Selenium.Support.UI.SelectElement" $element' -ea Stop
+            Invoke-Expression '$SelectElement = New-Object "Support.UI.SelectElement" $element' -ea Stop
             return $SelectElement
         }
         else {
