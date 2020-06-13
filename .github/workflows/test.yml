@@ -3,7 +3,7 @@ name: BrowserAutomationTest
 on: [push]
 
 jobs:
-  Tests_for_PowerShell_5:
+  Tests_PS5:
     runs-on: windows-latest
     defaults:
       run:
@@ -11,7 +11,7 @@ jobs:
 
     strategy:
       matrix:
-        browser: [chrome, firefox]
+        browser: [Chrome, Firefox, EdgeChromium]
       fail-fast: false
 
     steps:
@@ -32,7 +32,7 @@ jobs:
           TARGET_BROWSER: ${{ matrix.browser }}
 
 
-  Tests_for_PowerShell_7:
+  Tests_PS7:
     runs-on: windows-latest
     defaults:
       run:
@@ -40,7 +40,7 @@ jobs:
 
     strategy:
       matrix:
-        browser: [chrome, firefox]
+        browser: [Chrome, Firefox, EdgeChromium]
       fail-fast: false
 
     steps:
