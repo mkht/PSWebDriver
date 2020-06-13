@@ -3,8 +3,11 @@ name: BrowserAutomationTest
 on: [push]
 
 jobs:
-  test:
+  Tests_for_PowerShell_5:
     runs-on: windows-latest
+    defaults:
+      run:
+        shell: powershell
 
     strategy:
       matrix:
@@ -12,21 +15,47 @@ jobs:
       fail-fast: false
 
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - name: Install Pester
-      run: Install-Module Pester -Force -AllowClobber -Scope CurrentUser -SkipPublisherCheck
-      shell: powershell
+      - name: Install Pester
+        run: Install-Module Pester -Force -AllowClobber -Scope CurrentUser -SkipPublisherCheck
 
-    - name: Collect environment
-      run: |
-        $PSVersionTable
-        Get-ChildItem 'env:' | Format-Table -AutoSize -Wrap
-        Get-Module -ListAvailable
-      shell: powershell
+      - name: Collect environment
+        run: |
+          $PSVersionTable
+          Get-ChildItem 'env:' | Format-Table -AutoSize -Wrap
+          Get-Module -ListAvailable
 
-    - name: Tests - ${{ matrix.browser }}
-      run: Invoke-Pester -EnableExit
-      env:
-        TARGET_BROWSER: ${{ matrix.browser }}
-      shell: powershell
+      - name: Tests - ${{ matrix.browser }}
+        run: Invoke-Pester -CI -Output Detailed
+        env:
+          TARGET_BROWSER: ${{ matrix.browser }}
+
+
+  Tests_for_PowerShell_7:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
+
+    strategy:
+      matrix:
+        browser: [chrome, firefox]
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Pester
+        run: Install-Module Pester -Force -AllowClobber -Scope CurrentUser -SkipPublisherCheck
+
+      - name: Collect environment
+        run: |
+          $PSVersionTable
+          Get-ChildItem 'env:' | Format-Table -AutoSize -Wrap
+          Get-Module -ListAvailable
+
+      - name: Tests - ${{ matrix.browser }}
+        run: Invoke-Pester -CI -Output Detailed
+        env:
+          TARGET_BROWSER: ${{ matrix.browser }}
