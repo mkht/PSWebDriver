@@ -233,7 +233,7 @@ class PSWebDriver {
                 $this.Driver = New-Object $tmp($this.BrowserOptions)
             }
             else {
-                $this.Driver = New-Object $tmp($this.DriverService, $this.BrowserOptions, [TimeSpan]::FromMinutes(5))
+                $this.Driver = New-Object $tmp($this.DriverService, $this.BrowserOptions, [TimeSpan]::FromMinutes(3))
             }
         }
 

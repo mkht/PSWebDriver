@@ -23,6 +23,20 @@ BeforeAll {
     else {
         $global:Browser = $env:TARGET_BROWSER
     }
+
+    # Not sure why, but the first launch of the Firefox on the GitHub Actions is very slow and 
+    # cause a timeout exception, so avoid it by starting & closing the browser once.
+    if ($env:GITHUB_ACTIONS -eq $true) {
+        try {
+            $Driver = New-PSWebDriver -Name $global:Browser
+            $Driver.Start()
+            $Driver.Quit()
+        }
+        catch {}
+        finally {
+            $Driver = $null
+        }
+    }
 }
 
 Describe 'Find element(s)' {
