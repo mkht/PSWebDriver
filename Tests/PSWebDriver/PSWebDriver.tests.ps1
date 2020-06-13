@@ -649,7 +649,7 @@ Describe 'Miscellaneous Tests' {
 
     Context 'BrowserOption: AcceptInsecureCertificates' {
         It 'Accept Certificate Errors' {
-            if ($global:Browser -match 'Edge') {
+            if ($global:Browser -eq 'Edge') {
                 Set-ItResult -Skipped -Because 'Legacy Edge does not support "AcceptInsecureCertificates" option'
             }
 
