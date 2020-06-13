@@ -1,5 +1,6 @@
 ﻿#Requires -Version 5
 using namespace OpenQA.Selenium
+using namespace Microsoft.Edge.SeleniumTools
 
 #region Enum:ImageFormat
 Enum ImageFormat{
@@ -108,7 +109,7 @@ class PSWebDriver {
     #region Public Properties
     $Driver
     $Actions
-    [ValidateSet('Chrome', 'Firefox', 'Edge', 'HeadlessChrome', 'HeadlessFirefox', 'IE', 'InternetExplorer')]
+    [ValidateSet('Chrome', 'Firefox', 'Edge', 'EdgeChromium', 'HeadlessChrome', 'HeadlessFirefox', 'IE', 'InternetExplorer')]
     [string] $BrowserName
     [DriverOptions] $BrowserOptions
     [DriverService] $DriverService
@@ -214,6 +215,9 @@ class PSWebDriver {
 
         if ($this.StrictBrowserName -eq 'IE') {
             $local:tmp = 'IE.InternetExplorerDriver'
+        }
+        elseif ($this.StrictBrowserName -eq 'EdgeChromium') {
+            $local:tmp = 'EdgeDriver'
         }
         else {
             $local:tmp = [string]('{0}.{0}{1}' -f $this.StrictBrowserName, 'Driver')
@@ -843,6 +847,19 @@ class PSWebDriver {
                 throw "Couldn't load Selenium Support"
             }
         }
+
+        if (($this.Browser -eq 'EdgeChromium') -and !('Microsoft.Edge.SeleniumTools.EdgeDriver' -as [type])) {
+            if (!($SeleniumPath = Resolve-Path "$LibPath\microsoft.edge.seleniumtools.*\lib\netstandard2.0" -ea SilentlyContinue)) {
+                throw "Couldn't find Microsoft.Edge.SeleniumTools.dll"
+            }
+            # Load Microsoft.Edge.SeleniumTools
+            try {
+                Add-Type -Path (Join-Path $SeleniumPath 'Microsoft.Edge.SeleniumTools.dll') -ErrorAction Stop
+            }
+            catch {
+                throw "Couldn't load Microsoft.Edge.SeleniumTools"
+            }
+        }
     }
 
     Hidden [void]_LoadWebDriver() {
@@ -850,9 +867,13 @@ class PSWebDriver {
         if ($this.StrictBrowserName -eq 'IE') {
             $local:exe = 'IEDriverServer.exe'
         }
+        elseif ($this.StrictBrowserName -eq 'EdgeChromium') {
+            $local:exe = 'msedgedriver.exe'
+        }
         else {
             $local:exe = $dir + '.exe'
         }
+
         if (!(Get-Command $exe -ErrorAction SilentlyContinue)) {
             $DriverPath = Join-Path $this.PSModuleRoot "\Bin\$dir"
             if (Resolve-Path $DriverPath -ErrorAction SilentlyContinue) {
@@ -884,6 +905,7 @@ class PSWebDriver {
             'Firefox' { 'GeckoDriver'; break }
             'HeadlessFirefox' { 'GeckoDriver'; break }
             'Edge' { 'MicrosoftWebDriver'; break }
+            'EdgeChromium' { 'EdgeDriver'; break }
             'IE' { 'IEDriver'; break }
             'InternetExplorer' { 'IEDriver'; break }
             'Chrome' { 'ChromeDriver'; break }
@@ -908,6 +930,11 @@ class PSWebDriver {
             }
             'Edge' {
                 $Options = New-Object Edge.EdgeOptions
+                break
+            }
+            'EdgeChromium' {
+                $Options = New-Object Microsoft.Edge.SeleniumTools.EdgeOptions
+                $Options.UseChromium = $true
                 break
             }
             'IE' {
@@ -951,6 +978,10 @@ class PSWebDriver {
             }
             'Edge' {
                 $Service = [Edge.EdgeDriverService]::CreateDefaultService()
+                break
+            }
+            'EdgeChromium' {
+                $Service = [Microsoft.Edge.SeleniumTools.EdgeDriverService]::CreateChromiumService()
                 break
             }
             'IE' {
@@ -1323,7 +1354,7 @@ function New-PSWebDriver {
     [OutputType([PSWebDriver])]
     param(
         [Parameter(Mandatory, Position = 0)]
-        [ValidateSet('Chrome', 'Firefox', 'Edge', 'HeadlessChrome', 'HeadlessFirefox', 'IE', 'InternetExplorer')]
+        [ValidateSet('Chrome', 'Firefox', 'Edge', 'EdgeChromium', 'HeadlessChrome', 'HeadlessFirefox', 'IE', 'InternetExplorer')]
         [string]
         $Name
     )

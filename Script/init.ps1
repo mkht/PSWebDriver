@@ -31,6 +31,19 @@ if (("OpenQA.Selenium.By" -as [type]) -and !("OpenQA.Selenium.Support.UI.SelectE
     }
 }
 
+if (!('Microsoft.Edge.SeleniumTools.EdgeDriver' -as [type])) {
+    if (!($SeleniumPath = Resolve-Path "$PSModuleRoot\Lib\microsoft.edge.seleniumtools.*\lib\netstandard2.0" -ea SilentlyContinue)) {
+        throw "Couldn't find Microsoft.Edge.SeleniumTools.dll"
+    }
+    # Load Microsoft.Edge.SeleniumTools
+    try {
+        Add-Type -Path (Join-Path $SeleniumPath 'Microsoft.Edge.SeleniumTools.dll') -ErrorAction Stop
+    }
+    catch {
+        throw "Couldn't load Microsoft.Edge.SeleniumTools"
+    }
+}
+
 # Import Assert function
 if ($AssertPath = Resolve-Path "$PSModuleRoot\Function\Assert.psm1" -ea SilentlyContinue) {
     Import-Module $AssertPath -Force
