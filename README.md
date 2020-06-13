@@ -17,7 +17,8 @@ https://chromedriver.chromium.org/
 https://github.com/mozilla/geckodriver
 
 + **Microsoft Edge**  
-https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/
+https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/  
+※PSWebDriverはEdge(Legacy)、Edge(Chromium)の両方をサポートしています
 
 + **Internet Explorer**  
 https://selenium.dev/downloads/  
@@ -32,7 +33,7 @@ https://selenium.dev/downloads/
 Google Chromeを使用して[DuckDuckGo](https://duckduckgo.com/)を開き、"PowerShell"と検索、検索結果のスクリーンショットを取得してブラウザを終了する例
 ```PowerShell
 #インスタンスの生成
-$Browser = New-PSWebDriver 'Chrome' #Chrome/Firefox/Edge/IE/HeadlessChrome/HeadlessFirefox
+$Browser = New-PSWebDriver 'Chrome' #Chrome/Firefox/Edge/EdgeChromium/IE/HeadlessChrome/HeadlessFirefox
 #ブラウザを起動
 $Browser.Start()
 #DuckDuckGoを開く
@@ -223,6 +224,10 @@ $Browser.SendKeys('id=target', 'ABC${KEY_BACKSPACE}${KEY_ENTER}')
 > * Selenium.Support
 > Copyright (c) Software Freedom Conservancy
 > Licensed under the [Apache 2.0 License](http://www.apache.org/licenses/LICENSE-2.0).
+>
+> * edge-selenium-tools
+> Copyright (c) Microsoft
+> Licensed under the [Apache 2.0 License](https://github.com/microsoft/edge-selenium-tools/blob/master/LICENSE).
 >
 > * AnimatedGif
 > Copyright (c) mrousavy
