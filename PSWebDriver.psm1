@@ -8,4 +8,12 @@ foreach ($class in $ClassList) {
     . $PSScriptRoot\Class\$class
 }
 
-Export-ModuleMember -Function ('New-PSWebDriver', 'New-Selector')
+# Load Functions
+$FunctionList = @(
+    'Set-WebDriverEnvironment.ps1'
+)
+foreach ($function in $FunctionList) {
+    . $PSScriptRoot\Function\$function
+}
+
+Export-ModuleMember -Function ('New-PSWebDriver', 'New-Selector', 'Set-WebDriverEnvironment')

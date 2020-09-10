@@ -12,7 +12,7 @@
     RootModule        = 'PSWebDriver.psm1'
 
     # このモジュールのバージョン番号です。
-    ModuleVersion     = '0.0.4'
+    ModuleVersion     = '0.1.5'
 
     # サポートされている PSEditions
     # CompatiblePSEditions = @()
@@ -75,6 +75,7 @@
     FunctionsToExport = @(
         'New-PSWebDriver',
         'New-Selector'
+        'Set-WebDriverEnvironment'
     )
 
     # このモジュールからエクスポートするコマンドレットです。最適なパフォーマンスを得るには、ワイルドカードを使用せず、エクスポートするコマンドレットがない場合は、エントリを削除しないで空の配列を使用してください。
