@@ -29,23 +29,23 @@
                 'Chrome' { 
                     Set-ChromeEnvironment -BrowserBinaryPath $BrowserBinaryPath
                     break
-                 }
+                }
                 'Firefox' { 
                     Set-FirefoxEnvironment
                     break
-                 }
+                }
                 'Edge' { 
                     Set-EdgeEnvironment
                     break
-                 }
+                }
                 'EdgeChromium' { 
                     Set-EdgeChromiumEnvironment -BrowserBinaryPath $BrowserBinaryPath
                     break
-                 }
+                }
                 'InternetExplorer' { 
                     Set-InternetExplorerEnvironment
                     break
-                 }
+                }
                 Default {}
             }
         }
@@ -154,11 +154,7 @@ function Set-ChromeEnvironment {
         # Add PATH
         $CurrentPath = $env:PATH -split ';'
         if (-not ($DriverSavePath -in $CurrentPath)) {
-            Write-Verbose ('Add {0} to the user PATH' -f $DriverSavePath)
-            $env:PATH = $DriverSavePath + ';' + $env:PATH
-            $UserEnvPath = [Environment]::GetEnvironmentVariable('PATH', 'User') -split ';'
-            $UserEnvPath += $DriverSavePath
-            [Environment]::SetEnvironmentVariable('PATH', ($UserEnvPath -join ';'), 'User')
+            Add-PathEnvironment -Path $DriverSavePath -Scope User -ErrorAction SilentlyContinue
         }
     }
 }
@@ -236,11 +232,7 @@ function Set-InternetExplorerEnvironment {
         # Add PATH
         $CurrentPath = $env:PATH -split ';'
         if (-not ($DriverSavePath -in $CurrentPath)) {
-            Write-Verbose ('Add {0} to the user PATH' -f $DriverSavePath)
-            $env:PATH = $DriverSavePath + ';' + $env:PATH
-            $UserEnvPath = [Environment]::GetEnvironmentVariable('PATH', 'User') -split ';'
-            $UserEnvPath += $DriverSavePath
-            [Environment]::SetEnvironmentVariable('PATH', ($UserEnvPath -join ';'), 'User')
+            Add-PathEnvironment -Path $DriverSavePath -Scope User -ErrorAction SilentlyContinue
         }
     }
 }
@@ -372,11 +364,7 @@ function Set-EdgeChromiumEnvironment {
         # Add PATH
         $CurrentPath = $env:PATH -split ';'
         if (-not ($DriverSavePath -in $CurrentPath)) {
-            Write-Verbose ('Add {0} to the user PATH' -f $DriverSavePath)
-            $env:PATH = $DriverSavePath + ';' + $env:PATH
-            $UserEnvPath = [Environment]::GetEnvironmentVariable('PATH', 'User') -split ';'
-            $UserEnvPath += $DriverSavePath
-            [Environment]::SetEnvironmentVariable('PATH', ($UserEnvPath -join ';'), 'User')
+            Add-PathEnvironment -Path $DriverSavePath -Scope User -ErrorAction SilentlyContinue
         }
     }
 }
@@ -453,11 +441,76 @@ function Set-FirefoxEnvironment {
         # Add PATH
         $CurrentPath = $env:PATH -split ';'
         if (-not ($DriverSavePath -in $CurrentPath)) {
-            Write-Verbose ('Add {0} to the user PATH' -f $DriverSavePath)
-            $env:PATH = $DriverSavePath + ';' + $env:PATH
-            $UserEnvPath = [Environment]::GetEnvironmentVariable('PATH', 'User') -split ';'
-            $UserEnvPath += $DriverSavePath
-            [Environment]::SetEnvironmentVariable('PATH', ($UserEnvPath -join ';'), 'User')
+            Add-PathEnvironment -Path $DriverSavePath -Scope User -ErrorAction SilentlyContinue
+        }
+    }
+}
+
+
+function Send-SettingChange {
+    if (-not ('Win32.NativeMethods' -as [type])) {
+        Add-Type -Namespace Win32 -Name NativeMethods -MemberDefinition @'
+[DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+public static extern IntPtr SendMessageTimeout(IntPtr hWnd, uint Msg, UIntPtr wParam, string lParam, uint fuFlags, uint uTimeout, out UIntPtr lpdwResult);
+'@
+    }
+
+    $HWND_BROADCAST = [IntPtr]0xffff
+    $WM_SETTINGCHANGE = 0x001A
+    $result = [UIntPtr]::Zero
+
+    $SendMessageResult = [Win32.NativeMethods]::SendMessageTimeout($HWND_BROADCAST, $WM_SETTINGCHANGE, [UIntPtr]::Zero, 'Environment', 0x0002, 5000, [ref]$result)
+
+    if ($SendMessageResult -eq 0) {
+        Write-Error -Message 'SendMessageTimeout returns error'
+    }
+}
+
+function Add-PathEnvironment {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory, Position = 0, ValueFromPipeline)]
+        [string[]]$Path,
+
+        [Parameter(Position = 1)]
+        [ValidateSet('User', 'Machine', 'Process')]
+        [Alias('Target')]
+        [string]$Scope = 'Process'
+    )
+
+    Begin {
+        if ($Scope -eq 'Machine') {
+            # Check administrator privileges
+            $currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
+            if (-not $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+                $er = [System.Management.Automation.ErrorRecord]::new(
+                    'The requested operation requires administrator privileges.',
+                    'Add-PathEnvironment',
+                    [System.Management.Automation.ErrorCategory]::PermissionDenied,
+                    $null
+                )
+                $PSCmdlet.ThrowTerminatingError($er)
+            }
+        }
+    }
+
+    Process {
+        foreach ($p in $Path) {
+            Write-Verbose ('Add {0} to the PATH' -f $p)
+            $EnvPath = [Environment]::GetEnvironmentVariable('PATH', $Scope) -split ';'
+
+            if ($p -in $EnvPath) {
+                Write-Error -Message 'Specified path already exists in the PATH variable.'
+                return
+            }
+            
+            $EnvPath += $p
+            [Environment]::SetEnvironmentVariable('PATH', ($EnvPath -join ';'), $Scope)
+
+            if ($Scope -ne 'Process') {
+                # Broadcast WM_SETTINGCHANGE
+                Send-SettingChange
+            }
         }
     }
 }
