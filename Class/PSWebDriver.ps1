@@ -794,7 +794,8 @@ class PSWebDriver {
         }
         else {
             # Path normalization
-            $NormalizedFilePath = [System.IO.Path]::GetFullPath($FileName, $PWD)
+            # $NormalizedFilePath = [System.IO.Path]::GetFullPath($FileName, $PWD)  #This method can be used only on .NET Core
+            $NormalizedFilePath = [System.IO.Path]::GetFullPath((Join-path $PWD $FileName))
 
             $SaveFolder = Split-Path $NormalizedFilePath -Parent
             if ($null -eq $SaveFolder) {
