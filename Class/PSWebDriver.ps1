@@ -794,9 +794,18 @@ class PSWebDriver {
         }
         else {
             # Path normalization
-            # $NormalizedFilePath = [System.IO.Path]::GetFullPath($FileName, $PWD)  #This method can be used only on .NET Core
-            $NormalizedFilePath = [System.IO.Path]::GetFullPath((Join-path $PWD $FileName))
-
+            if ($PSVersionTable.PSVersion -gt 6.1) {
+                $NormalizedFilePath = [System.IO.Path]::GetFullPath($FileName, $PWD)  #This method can be used only on .NET Core 2.1+
+            }
+            else {
+                if (([uri]$FileName).IsAbsoluteUri) {
+                    $NormalizedFilePath = [System.IO.Path]::GetFullPath($FileName)
+                }
+                else {
+                    $NormalizedFilePath = [System.IO.Path]::GetFullPath((Join-path $PWD $FileName))
+                }
+            }
+            
             $SaveFolder = Split-Path $NormalizedFilePath -Parent
             if ($null -eq $SaveFolder) {
                 throw [System.ArgumentNullException]::new()
