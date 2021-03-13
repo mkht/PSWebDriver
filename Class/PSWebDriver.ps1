@@ -793,13 +793,19 @@ class PSWebDriver {
             $this._WarnBrowserNotStarted()
         }
         else {
-            $SaveFolder = Split-Path $FileName -Parent
-            if (! (Test-Path -LiteralPath $SaveFolder -PathType Container)) {
+            # Path normalization
+            $NormalizedFilePath = [System.IO.Path]::GetFullPath($FileName, $PWD)
+
+            $SaveFolder = Split-Path $NormalizedFilePath -Parent
+            if ($null -eq $SaveFolder) {
+                throw [System.ArgumentNullException]::new()
+            }
+            elseif (! (Test-Path -LiteralPath $SaveFolder -PathType Container)) {
                 New-Item $SaveFolder -ItemType Directory
             }
             #TODO:To alternate [System.Drawing.Image] class
             Invoke-Expression '$ScreenShot = [Screenshot]$this.Driver.GetScreenShot()'
-            Invoke-Expression '$ScreenShot.SaveAsFile($FileName, [ScreenshotImageFormat]$ImageFormat)'
+            Invoke-Expression '$ScreenShot.SaveAsFile($NormalizedFilePath, [ScreenshotImageFormat]$ImageFormat)'
         }
     }
 
