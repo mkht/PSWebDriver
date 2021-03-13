@@ -12,7 +12,7 @@
     RootModule        = 'PSWebDriver.psm1'
 
     # このモジュールのバージョン番号です。
-    ModuleVersion     = '0.1.6'
+    ModuleVersion     = '0.1.7'
 
     # サポートされている PSEditions
     # CompatiblePSEditions = @()
@@ -27,7 +27,7 @@
     CompanyName       = 'mkht'
 
     # このモジュールの著作権情報
-    Copyright         = '(c) 2020 mkht. All rights reserved.'
+    Copyright         = '(c) 2021 mkht. All rights reserved.'
 
     # このモジュールの機能の説明
     Description       = 'PowerShell Selenium WebDriver module'

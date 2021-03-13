@@ -212,7 +212,7 @@ $Browser.SendKeys('id=target', 'ABC${KEY_BACKSPACE}${KEY_ENTER}')
 
 ----
 ## ライセンス
-> Copyright (c) 2020 mkht
+> Copyright (c) 2021 mkht
 > PSWebDriver is released under the MIT License
 > https://github.com/mkht/PSWebDriver/blob/master/LICENSE
 >
