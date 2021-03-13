@@ -794,7 +794,7 @@ class PSWebDriver {
         }
         else {
             # Path normalization
-            if ($PSVersionTable.PSVersion -gt 6.1) {
+            if ($global:PSVersionTable.PSVersion -gt 6.1) {
                 $NormalizedFilePath = [System.IO.Path]::GetFullPath($FileName, $PWD)  #This method can be used only on .NET Core 2.1+
             }
             else {
