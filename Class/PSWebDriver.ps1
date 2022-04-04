@@ -1001,12 +1001,12 @@ class PSWebDriver {
         switch ($BrowserName) {
             'Firefox' {
                 $Service = [Firefox.FirefoxDriverService]::CreateDefaultService()
-                if ($global:PSEdition -eq 'Core') { $Service.Host = '::1' } # Workaround for performance issue of the Firefox on .NET Core
+                # if ($global:PSEdition -eq 'Core') { $Service.Host = '::1' } # Workaround for performance issue of the Firefox on .NET Core
                 break
             }
             'HeadlessFirefox' {
                 $Service = [Firefox.FirefoxDriverService]::CreateDefaultService()
-                if ($global:PSEdition -eq 'Core') { $Service.Host = '::1' }
+                # if ($global:PSEdition -eq 'Core') { $Service.Host = '::1' }
                 break
             }
             'Edge' {
