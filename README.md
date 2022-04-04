@@ -225,10 +225,6 @@ $Browser.SendKeys('id=target', 'ABC${KEY_BACKSPACE}${KEY_ENTER}')
 > Copyright (c) Software Freedom Conservancy
 > Licensed under the [Apache 2.0 License](http://www.apache.org/licenses/LICENSE-2.0).
 >
-> * edge-selenium-tools
-> Copyright (c) Microsoft
-> Licensed under the [Apache 2.0 License](https://github.com/microsoft/edge-selenium-tools/blob/master/LICENSE).
->
 > * AnimatedGif
 > Copyright (c) mrousavy
 > Licensed under the [MIT License](https://github.com/mrousavy/AnimatedGif/blob/master/LICENSE).
