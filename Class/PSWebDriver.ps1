@@ -1,16 +1,6 @@
-#Requires -Version 5
+﻿#Requires -Version 5
 using namespace OpenQA.Selenium
-using namespace Microsoft.Edge.SeleniumTools
-
-#region Enum:ImageFormat
-Enum ImageFormat{
-    Png = 0
-    Jpeg = 1
-    Gif = 2
-    Tiff = 3
-    Bmp = 4
-}
-#endregion
+using namespace System.Drawing.Imaging
 
 #region Enum:SelectorType
 Enum SelectorType{
@@ -813,9 +803,28 @@ class PSWebDriver {
             elseif (! (Test-Path -LiteralPath $SaveFolder -PathType Container)) {
                 New-Item $SaveFolder -ItemType Directory
             }
-            #TODO:To alternate [System.Drawing.Image] class
-            Invoke-Expression '$ScreenShot = [Screenshot]$this.Driver.GetScreenShot()'
-            Invoke-Expression '$ScreenShot.SaveAsFile($NormalizedFilePath, [ScreenshotImageFormat]$ImageFormat)'
+
+            $ImageStream = $null
+            $FileStream = $null
+            $ScreenshotImage = $null
+            try {
+                $ScreenShot = $this.Driver.GetScreenShot()
+                $ImageStream = [System.IO.MemoryStream]::new($ScreenShot.AsByteArray)
+                $FileStream = [System.IO.FileStream]::new($NormalizedFilePath, [System.IO.FileMode]::Create)
+                $ScreenshotImage = [System.Drawing.Image]::FromStream($ImageStream)
+                $ScreenshotImage.Save($FileStream, $ImageFormat)
+            }
+            finally {
+                if ($ScreenshotImage) {
+                    $ScreenshotImage.Dispose()
+                }
+                if ($FileStream) {
+                    $FileStream.Dispose()
+                }
+                if ($ImageStream) {
+                    $ImageStream.Dispose()
+                }
+            }
         }
     }
 
@@ -828,7 +837,15 @@ class PSWebDriver {
             '.gif' { [ImageFormat]::Gif; break }
             '.tif' { [ImageFormat]::Tiff; break }
             '.tiff' { [ImageFormat]::Tiff; break }
-            Default { [ImageFormat]::Png }
+            Default { 
+                $ext = $_.Replace('.', '')
+                if ($ext -as [ImageFormat]) {
+                    $ext -as [ImageFormat]
+                }
+                else {
+                    [ImageFormat]::Png
+                }
+            }
         }
 
         $this.SaveScreenShot($FileName, $Format)
@@ -839,7 +856,7 @@ class PSWebDriver {
     Hidden [void]_LoadSelenium() {
         $LibPath = Join-Path $this.PSModuleRoot '\Lib'
         if (!('OpenQA.Selenium.By' -as [type])) {
-            if (!($SeleniumPath = Resolve-Path "$LibPath\Selenium.WebDriver.*\lib\net40" -ea SilentlyContinue)) {
+            if (!($SeleniumPath = Resolve-Path "$LibPath\Selenium.WebDriver.*\lib\netstandard2.0" -ea SilentlyContinue)) {
                 throw "Couldn't find WebDriver.dll"
             }
             # Load Selenium
@@ -852,7 +869,7 @@ class PSWebDriver {
         }
 
         if (('OpenQA.Selenium.By' -as [type]) -and !('OpenQA.Selenium.Support.UI.SelectElement' -as [type])) {
-            if (!($SeleniumPath = Resolve-Path "$LibPath\Selenium.Support.*\lib\net40" -ea SilentlyContinue)) {
+            if (!($SeleniumPath = Resolve-Path "$LibPath\Selenium.Support.*\lib\netstandard2.0" -ea SilentlyContinue)) {
                 throw "Couldn't find WebDriver.Support.dll"
             }
             # Load Selenium Support
@@ -984,7 +1001,7 @@ class PSWebDriver {
                 break
             }
             'EdgeChromium' {
-                $Service = [Microsoft.Edge.SeleniumTools.EdgeDriverService]::CreateChromiumService()
+                $Service = [Edge.EdgeDriverService]::CreateDefaultService()
                 break
             }
             'IE' {
