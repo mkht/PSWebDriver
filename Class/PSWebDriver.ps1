@@ -875,7 +875,7 @@ class PSWebDriver {
     Hidden [void]_LoadSelenium() {
         $LibPath = Join-Path $this.PSModuleRoot '\Lib'
         if (!('OpenQA.Selenium.By' -as [type])) {
-            if (!($SeleniumPath = Resolve-Path "$LibPath\Selenium.WebDriver.*\lib\netstandard2.0" -ea SilentlyContinue)) {
+            if (!($SeleniumPath = Resolve-Path "$LibPath\Selenium.WebDriver.*\lib\net46" -ea SilentlyContinue)) {
                 throw "Couldn't find WebDriver.dll"
             }
             # Load Selenium
@@ -888,7 +888,7 @@ class PSWebDriver {
         }
 
         if (('OpenQA.Selenium.By' -as [type]) -and !('OpenQA.Selenium.Support.UI.SelectElement' -as [type])) {
-            if (!($SeleniumPath = Resolve-Path "$LibPath\Selenium.Support.*\lib\netstandard2.0" -ea SilentlyContinue)) {
+            if (!($SeleniumPath = Resolve-Path "$LibPath\Selenium.Support.*\lib\net46" -ea SilentlyContinue)) {
                 throw "Couldn't find WebDriver.Support.dll"
             }
             # Load Selenium Support

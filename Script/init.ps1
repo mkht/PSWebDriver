@@ -6,7 +6,7 @@ Write-Debug ('$PSModuleRoot:{0}' -f $PSModuleRoot)
 
 # Load Selenium WebDriver DLL
 if (!("OpenQA.Selenium.By" -as [type])) {
-    if (!($SeleniumPath = Resolve-Path "$PSModuleRoot\Lib\Selenium.WebDriver.*\lib\netstandard2.0" -ea SilentlyContinue)) {
+    if (!($SeleniumPath = Resolve-Path "$PSModuleRoot\Lib\Selenium.WebDriver.*\lib\net46" -ea SilentlyContinue)) {
         Write-Error "Couldn't find WebDriver.dll"
     }
     # Load Selenium
@@ -19,7 +19,7 @@ if (!("OpenQA.Selenium.By" -as [type])) {
 }
 
 if (("OpenQA.Selenium.By" -as [type]) -and !("OpenQA.Selenium.Support.UI.SelectElement" -as [type])) {
-    if (!($SeleniumPath = Resolve-Path "$PSModuleRoot\Lib\Selenium.Support.*\lib\netstandard2.0" -ea SilentlyContinue)) {
+    if (!($SeleniumPath = Resolve-Path "$PSModuleRoot\Lib\Selenium.Support.*\lib\net46" -ea SilentlyContinue)) {
         Write-Error "Couldn't find WebDriver.Support.dll"
     }
     # Load Selenium Support
