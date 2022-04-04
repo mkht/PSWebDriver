@@ -6,15 +6,6 @@
 #Requires -Version 5.0
 #Requires -Modules @{ ModuleName="Pester"; ModuleVersion="5.0.2" }
 
-# Import module
-$script:moduleRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
-Get-Module 'PSWebDriver' | Remove-Module -Force
-Import-Module (Join-Path $script:moduleRoot './PSWebDriver.psd1') -Force
-
-# TestData
-$script:moduleRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
-$script:TestData = Join-Path $script:moduleRoot '\Tests\TestData\index.html'
-
 BeforeAll {
     # Specify Browser
     if (-not $env:TARGET_BROWSER) {
@@ -23,6 +14,15 @@ BeforeAll {
     else {
         $global:Browser = $env:TARGET_BROWSER
     }
+
+    # Import module
+    $script:moduleRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+    Get-Module 'PSWebDriver' | Remove-Module -Force
+    Import-Module (Join-Path $script:moduleRoot './PSWebDriver.psd1') -Force
+
+    # TestData
+    $script:moduleRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+    $script:TestData = Join-Path $script:moduleRoot '\Tests\TestData\index.html'
 
     # Not sure why, but the first launch of the Firefox on the GitHub Actions is very slow and 
     # cause a timeout exception, so avoid it by starting & closing the browser once.
@@ -57,7 +57,7 @@ Describe 'Find element(s)' {
     Context 'FindElement([Selector]$Selector)' {
         It 'Return WebElement when element found' {
             $selector = New-Selector -Expression 'btn1' -Type Id
-            $Driver.FindElement($selector) | Should -BeOfType 'OpenQA.Selenium.Remote.RemoteWebElement'
+            $Driver.FindElement($selector) | Should -BeOfType 'OpenQA.Selenium.IWebElement'
         }
 
         It 'Throw NoSuchElementException when element not found' {
@@ -68,7 +68,7 @@ Describe 'Find element(s)' {
 
     Context 'FindElement([string]$SelectorExpression)' {
         It 'Return WebElement when element found' {
-            $Driver.FindElement('id=btn1') | Should -BeOfType 'OpenQA.Selenium.Remote.RemoteWebElement'
+            $Driver.FindElement('id=btn1') | Should -BeOfType 'OpenQA.Selenium.IWebElement'
         }
 
         It 'Throw NoSuchElementException when element not found' {
@@ -78,7 +78,7 @@ Describe 'Find element(s)' {
 
     Context 'FindElement([string]$SelectorExpression, [SelectorType]$Type)' {
         It 'Return WebElement when element found' {
-            $Driver.FindElement('btn1', 'Id') | Should -BeOfType 'OpenQA.Selenium.Remote.RemoteWebElement'
+            $Driver.FindElement('btn1', 'Id') | Should -BeOfType 'OpenQA.Selenium.IWebElement'
         }
 
         It 'Throw NoSuchElementException when element not found' {

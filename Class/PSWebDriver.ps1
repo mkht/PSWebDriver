@@ -1,4 +1,4 @@
-﻿#Requires -Version 5
+#Requires -Version 5
 using namespace OpenQA.Selenium
 using namespace Microsoft.Edge.SeleniumTools
 
@@ -861,19 +861,6 @@ class PSWebDriver {
             }
             catch {
                 throw "Couldn't load Selenium Support"
-            }
-        }
-
-        if (($this.Browser -eq 'EdgeChromium') -and !('Microsoft.Edge.SeleniumTools.EdgeDriver' -as [type])) {
-            if (!($SeleniumPath = Resolve-Path "$LibPath\microsoft.edge.seleniumtools.*\lib\netstandard2.0" -ea SilentlyContinue)) {
-                throw "Couldn't find Microsoft.Edge.SeleniumTools.dll"
-            }
-            # Load Microsoft.Edge.SeleniumTools
-            try {
-                Add-Type -Path (Join-Path $SeleniumPath 'Microsoft.Edge.SeleniumTools.dll') -ErrorAction Stop
-            }
-            catch {
-                throw "Couldn't load Microsoft.Edge.SeleniumTools"
             }
         }
     }

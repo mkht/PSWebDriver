@@ -6,7 +6,7 @@ Write-Debug ('$PSModuleRoot:{0}' -f $PSModuleRoot)
 
 # Load Selenium WebDriver DLL
 if (!("OpenQA.Selenium.By" -as [type])) {
-    if (!($SeleniumPath = Resolve-Path "$PSModuleRoot\Lib\Selenium.WebDriver.*\lib\net40" -ea SilentlyContinue)) {
+    if (!($SeleniumPath = Resolve-Path "$PSModuleRoot\Lib\Selenium.WebDriver.*\lib\netstandard2.0" -ea SilentlyContinue)) {
         Write-Error "Couldn't find WebDriver.dll"
     }
     # Load Selenium
@@ -19,7 +19,7 @@ if (!("OpenQA.Selenium.By" -as [type])) {
 }
 
 if (("OpenQA.Selenium.By" -as [type]) -and !("OpenQA.Selenium.Support.UI.SelectElement" -as [type])) {
-    if (!($SeleniumPath = Resolve-Path "$PSModuleRoot\Lib\Selenium.Support.*\lib\net40" -ea SilentlyContinue)) {
+    if (!($SeleniumPath = Resolve-Path "$PSModuleRoot\Lib\Selenium.Support.*\lib\netstandard2.0" -ea SilentlyContinue)) {
         Write-Error "Couldn't find WebDriver.Support.dll"
     }
     # Load Selenium Support
@@ -28,19 +28,6 @@ if (("OpenQA.Selenium.By" -as [type]) -and !("OpenQA.Selenium.Support.UI.SelectE
     }
     catch {
         Write-Error "Couldn't load Selenium Support"
-    }
-}
-
-if (!('Microsoft.Edge.SeleniumTools.EdgeDriver' -as [type])) {
-    if (!($SeleniumPath = Resolve-Path "$PSModuleRoot\Lib\microsoft.edge.seleniumtools.*\lib\netstandard2.0" -ea SilentlyContinue)) {
-        throw "Couldn't find Microsoft.Edge.SeleniumTools.dll"
-    }
-    # Load Microsoft.Edge.SeleniumTools
-    try {
-        Add-Type -Path (Join-Path $SeleniumPath 'Microsoft.Edge.SeleniumTools.dll') -ErrorAction Stop
-    }
-    catch {
-        throw "Couldn't load Microsoft.Edge.SeleniumTools"
     }
 }
 
