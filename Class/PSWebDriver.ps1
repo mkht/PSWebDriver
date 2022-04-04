@@ -99,7 +99,7 @@ class PSWebDriver {
     #region Public Properties
     $Driver
     $Actions
-    [ValidateSet('Chrome', 'Firefox', 'Edge', 'EdgeChromium', 'HeadlessChrome', 'HeadlessFirefox', 'IE', 'InternetExplorer')]
+    [ValidateSet('Chrome', 'Firefox', 'Edge', 'HeadlessChrome', 'HeadlessFirefox', 'IE', 'InternetExplorer')]
     [string] $BrowserName
     [DriverOptions] $BrowserOptions
     [DriverService] $DriverService
@@ -205,9 +205,6 @@ class PSWebDriver {
 
         if ($this.StrictBrowserName -eq 'IE') {
             $local:tmp = 'IE.InternetExplorerDriver'
-        }
-        elseif ($this.StrictBrowserName -eq 'EdgeChromium') {
-            $local:tmp = 'EdgeDriver'
         }
         else {
             $local:tmp = [string]('{0}.{0}{1}' -f $this.StrictBrowserName, 'Driver')
@@ -887,7 +884,7 @@ class PSWebDriver {
         if ($this.StrictBrowserName -eq 'IE') {
             $local:exe = 'IEDriverServer.exe'
         }
-        elseif ($this.StrictBrowserName -eq 'EdgeChromium') {
+        elseif ($this.StrictBrowserName -eq 'Edge') {
             $local:exe = 'msedgedriver.exe'
         }
         else {
@@ -924,8 +921,7 @@ class PSWebDriver {
         [string]$local:tmp = switch ($BrowserName) {
             'Firefox' { 'GeckoDriver'; break }
             'HeadlessFirefox' { 'GeckoDriver'; break }
-            'Edge' { 'MicrosoftWebDriver'; break }
-            'EdgeChromium' { 'EdgeDriver'; break }
+            'Edge' { 'EdgeDriver'; break }
             'IE' { 'IEDriver'; break }
             'InternetExplorer' { 'IEDriver'; break }
             'Chrome' { 'ChromeDriver'; break }
@@ -950,11 +946,6 @@ class PSWebDriver {
             }
             'Edge' {
                 $Options = New-Object Edge.EdgeOptions
-                break
-            }
-            'EdgeChromium' {
-                $Options = New-Object Microsoft.Edge.SeleniumTools.EdgeOptions
-                $Options.UseChromium = $true
                 break
             }
             'IE' {
@@ -997,10 +988,6 @@ class PSWebDriver {
                 break
             }
             'Edge' {
-                $Service = [Edge.EdgeDriverService]::CreateDefaultService()
-                break
-            }
-            'EdgeChromium' {
                 $Service = [Edge.EdgeDriverService]::CreateDefaultService()
                 break
             }
@@ -1378,6 +1365,11 @@ function New-PSWebDriver {
         [string]
         $Name
     )
+
+    # For backword compatibility
+    if($Name -eq 'EdgeChromium'){
+        $Name = 'Edge'
+    }
 
     New-Object PSWebDriver($Name)
 }

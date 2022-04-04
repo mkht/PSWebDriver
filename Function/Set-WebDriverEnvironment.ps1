@@ -17,7 +17,7 @@
                 'Chrome' { 'Chrome'; break }
                 'Firefox' { 'Firefox'; break }
                 'Edge' { 'Edge'; break }
-                'EdgeChromium' { 'EdgeChromium'; break }
+                'EdgeChromium' { 'Edge'; break }
                 'HeadlessChrome' { 'Chrome'; break }
                 'HeadlessFirefox' { 'Firefox'; break }
                 'IE' { 'InternetExplorer'; break }
@@ -35,7 +35,7 @@
                     break
                 }
                 'Edge' { 
-                    Set-EdgeEnvironment
+                    Set-EdgeChromiumEnvironment -BrowserBinaryPath $BrowserBinaryPath
                     break
                 }
                 'EdgeChromium' { 
@@ -233,27 +233,6 @@ function Set-InternetExplorerEnvironment {
         $CurrentPath = $env:PATH -split ';'
         if (-not ($DriverSavePath -in $CurrentPath)) {
             Add-PathEnvironment -Path $DriverSavePath -Scope User -ErrorAction SilentlyContinue
-        }
-    }
-}
-
-function Set-EdgeEnvironment {
-    [CmdletBinding()]
-    param (
-    )
-    
-    process {
-        $Capability = Get-WindowsCapability -Name 'Microsoft.WebDriver~~~~0.0.1.0' -Online -ErrorAction Stop
-        if ($Capability.State -eq 'Installed') {
-            Write-Verbose 'Edge driver is already installed.'
-            return
-        }
-        else {
-            Write-Verbose 'Installing Edge driver.'
-            $result = Add-WindowsCapability -Name $Capability.Name -Online
-            if ($result.RestartNeeded) {
-                Write-Warning 'You should restart computer to enable this feature.'
-            }
         }
     }
 }

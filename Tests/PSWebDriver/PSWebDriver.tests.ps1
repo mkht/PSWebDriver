@@ -649,10 +649,6 @@ Describe 'Miscellaneous Tests' {
 
     Context 'BrowserOption: AcceptInsecureCertificates' {
         It 'Accept Certificate Errors' {
-            if ($global:Browser -eq 'Edge') {
-                Set-ItResult -Skipped -Because 'Legacy Edge does not support "AcceptInsecureCertificates" option'
-            }
-
             $TestURL = 'https://expired.badssl.com/'
             $Driver.BrowserOptions.AcceptInsecureCertificates = $true
             { $Driver.Start($TestURL) } | Should -Not -Throw
