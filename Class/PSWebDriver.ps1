@@ -512,6 +512,28 @@ class PSWebDriver {
     }
     #endregion
 
+    #region Method:NewWindow()
+    [void]NewWindow() {
+        if (!$this.Driver) {
+            $this._WarnBrowserNotStarted()
+        }
+        else {
+            $this.Driver.SwitchTo().NewWindow([WindowType]::Window)
+        }
+    }
+    #endregion
+
+    #region Method:NewTab()
+    [void]NewTab() {
+        if (!$this.Driver) {
+            $this._WarnBrowserNotStarted()
+        }
+        else {
+            $this.Driver.SwitchTo().NewWindow([WindowType]::Tab)
+        }
+    }
+    #endregion
+
     #region Switch window
     [void]SelectWindow([string]$Title) {
         if (!$this.Driver) {

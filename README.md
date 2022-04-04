@@ -110,6 +110,10 @@ $WebDriver = New-PSWebDriver -Name 'Chrome'
 |Select([string]$Target, [string]$Value)|void|`$Target`(SelectorExpression)で指定されるSelect要素から`$Value`をテキストに持つ要素を選択します|
 |CloseAlert()|void|アラートを閉じます|
 |CloseAlertAndGetText([bool]$Accept)|string|アラートテキストを取得し、アラートを閉じます<br>`$Accept`でアラートに対する`OK` or `Cancel`を指定できます|
+|SelectFrame([string]$Name)|void|指定した名前のフレームに移動します|
+|SelectWindow([string]$Title)|void|指定したタイトルのウィンドウに移動します|
+|NewWindow()|void|新しいウィンドウを開きます|
+|NewTab()|void|新しいタブを開きます|
 
 ##### 待機
 |名前|戻り値型|説明|
