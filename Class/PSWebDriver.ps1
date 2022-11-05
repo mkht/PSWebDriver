@@ -15,6 +15,16 @@ Enum SelectorType{
 }
 #endregion
 
+#region Enum:RelativeLocator
+Enum RelativeLocator{
+    Above
+    Below
+    LeftOf
+    RightOf
+    Near
+}
+#endregion
+
 #region Class:Selector
 class Selector {
     [string]$Expression
@@ -424,6 +434,40 @@ class PSWebDriver {
             # Reset implicit wait
             if ($this.Driver) { $this.SetImplicitWait($tmpWait) }
         }
+    }
+    #endregion
+
+    #region Method:FindRelativeElement()
+    [Object]FindRelativeElement([Selector]$TargetSelector, [RelativeLocator]$Position , [Selector]$SourceSelector) {
+        return @($this.FindRelativeElements($TargetSelector, $Position, $SourceSelector))[0]
+    }
+    #endregion
+
+    #region Method:FindRelativeElements()
+    [Object]FindRelativeElements([Selector]$TargetSelector, [RelativeLocator]$Position , [Selector]$SourceSelector) {
+        if ($sourceElement = $this.FindElement($SourceSelector)) {
+            switch ($Position) {
+                Above { 
+                    return $this.Driver.FindElements([RelativeBy]::WithLocator($TargetSelector.By).Above($sourceElement))
+                }
+                Below { 
+                    return $this.Driver.FindElements([RelativeBy]::WithLocator($TargetSelector.By).Below($sourceElement))
+                }
+                LeftOf { 
+                    return $this.Driver.FindElements([RelativeBy]::WithLocator($TargetSelector.By).LeftOf($sourceElement))
+                }
+                RightOf { 
+                    return $this.Driver.FindElements([RelativeBy]::WithLocator($TargetSelector.By).RightOf($sourceElement))
+                }
+                Near { 
+                    return $this.Driver.FindElements([RelativeBy]::WithLocator($TargetSelector.By).Near($sourceElement))
+                }
+                Default {
+                    throw 'Undefined relative locator type'
+                }
+            }
+        }
+        return $null
     }
     #endregion
 
@@ -1389,7 +1433,7 @@ function New-PSWebDriver {
     )
 
     # For backword compatibility
-    if($Name -eq 'EdgeChromium'){
+    if ($Name -eq 'EdgeChromium') {
         $Name = 'Edge'
     }
 

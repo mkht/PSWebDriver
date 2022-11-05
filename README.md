@@ -93,6 +93,8 @@ $WebDriver = New-PSWebDriver -Name 'Chrome'
 |FindElement([string]$SelectorExpression)|Object|`$SelectorExpression`で指定されるページ内の要素を取得します|
 |FindElements([string]$SelectorExpression)|Object[]|`$SelectorExpression`にマッチする全ての要素を取得します|
 |IsElementPresent([string]$SelectorExpression)|bool|`$SelectorExpression`で指定される要素が存在するか確認します|
+|FindRelativeElement([string]$Target, [string]$Position, [string]$Reference)|Object|(実験的)<br>`$Reference`で指定される要素に対して`$Position`方向にある要素のうち<br>`$Target`で指定されるページ内の要素を取得します<br>`$Position`に指定できる値は`Above`,`Below`,`LeftOf`,`RightOf`,`Near`です|
+|FindRelativeElements([string]$Target, [string]$Position, [string]$Reference)|Object[]|(実験的)<br>`$Reference`で指定される要素に対して`$Position`方向にある要素のうち<br>`$Target`で指定される全ての要素を取得します<br>`$Position`に指定できる値は`Above`,`Below`,`LeftOf`,`RightOf`,`Near`です|
 |GetText([string]$SelectorExpression)|string|`$SelectorExpression`で指定される要素のinnerTextを取得します|
 |GetAttribute([string]$SelectorExpression, [string]$Attribute)|string|`$SelectorExpression`で指定される要素内の`$Attribute`属性値を取得します|
 |GetTitle()|string|現在開いているページタイトルを取得します|

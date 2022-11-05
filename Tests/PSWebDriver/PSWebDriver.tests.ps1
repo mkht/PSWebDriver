@@ -96,6 +96,43 @@ Describe 'Find element(s)' {
         }
     }
 
+    Context 'FindRelativeElement()' {
+        It 'Return Above element' {
+            $element = $Driver.FindRelativeElement('tag=input', 'above', 'name=last_name')
+            $element | Should -BeOfType 'OpenQA.Selenium.IWebElement'
+            $element.GetAttribute('name') | Should -Be 'first_name'
+        }
+
+        It 'Return Below element' {
+            $element = $Driver.FindRelativeElement('tag=input', 'below', 'name=last_name')
+            $element | Should -BeOfType 'OpenQA.Selenium.IWebElement'
+            $element.GetAttribute('name') | Should -Be 'password'
+        }
+
+        It 'Return Left of element' {
+            $element = $Driver.FindRelativeElement('tag=input', 'LeftOf', 'id=btnAlert')
+            $element | Should -BeOfType 'OpenQA.Selenium.IWebElement'
+            $element.GetAttribute('id') | Should -Be 'btnConfirm'
+        }
+
+        It 'Return Right of element' {
+            $element = $Driver.FindRelativeElement('tag=input', 'RightOf', 'id=btnAlert')
+            $element | Should -BeOfType 'OpenQA.Selenium.IWebElement'
+            $element.GetAttribute('id') | Should -Be 'btnPrompt'
+        }
+
+        It 'Throw Exception when an invalid position type specified' {
+            { $Driver.FindRelativeElement('tag=input', 'hoge', 'id=btnAlert') } | Should -Throw
+        }
+    }
+
+    Context 'FindRelativeElements()' {
+        It 'Return Right of elements' {
+            $elements = $Driver.FindRelativeElements('css=input[type="button"]', 'LeftOf', 'id=btnAlert')
+            $elements | Should -HaveCount 2
+        }
+    }
+
     Context 'IsElementPresent()' {
         It 'Return $true when the element found' {
             $Driver.IsElementPresent('id=btn1') | Should -Be $true
