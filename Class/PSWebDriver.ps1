@@ -56,13 +56,13 @@ class Selector {
     static Hidden [Object]GetSeleniumBy([string]$Expression, [SelectorType]$Type) {
         $local:SelectorObj =
         switch ($Type) {
-            'Id' { Invoke-Expression '[By]::Id($Expression)'; break }
-            'Name' { Invoke-Expression '[By]::Name($Expression)'; break }
-            'Tag' { Invoke-Expression '[By]::TagName($Expression)'; break }
-            'ClassName' { Invoke-Expression '[By]::ClassName($Expression)'; break }
-            'Link' { Invoke-Expression '[By]::LinkText($Expression)'; break }
-            'XPath' { Invoke-Expression '[By]::XPath($Expression)'; break }
-            'Css' { Invoke-Expression '[By]::CssSelector($Expression)'; break }
+            'Id' { [By]::Id($Expression); break }
+            'Name' { [By]::Name($Expression); break }
+            'Tag' { [By]::TagName($Expression); break }
+            'ClassName' { [By]::ClassName($Expression); break }
+            'Link' { [By]::LinkText($Expression); break }
+            'XPath' { [By]::XPath($Expression); break }
+            'Css' { [By]::CssSelector($Expression); break }
             Default {
                 throw 'Undefined selector type'
             }
