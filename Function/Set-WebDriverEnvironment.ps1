@@ -167,7 +167,7 @@ function Set-InternetExplorerEnvironment {
     
     begin {
         $DriverSavePath = Join-Path $env:USERPROFILE '.webdriver\iedriver'
-        $WebDriverDownloadLocation = 'https://selenium-release.storage.googleapis.com/3.150/IEDriverServer_Win32_3.150.1.zip'
+        $WebDriverDownloadLocation = 'https://github.com/SeleniumHQ/selenium/releases/download/selenium-4.6.0/IEDriverServer_Win32_4.6.0.zip'
     }
     
     process {
