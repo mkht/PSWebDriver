@@ -1,6 +1,10 @@
 name: BrowserAutomationTest
 
-on: [push]
+on: [push, workflow_dispatch]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   Tests_PS5:
@@ -40,7 +44,7 @@ jobs:
 
     strategy:
       matrix:
-        browser: [Chrome, Firefox, EdgeChromium]
+        browser: [Chrome, Firefox, Edge]
       fail-fast: false
 
     steps:
