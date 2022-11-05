@@ -18,7 +18,7 @@ https://github.com/mozilla/geckodriver
 
 + **Microsoft Edge**  
 https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/  
-※PSWebDriverはEdge(Legacy)、Edge(Chromium)の両方をサポートしています
+※PSWebDriverはEdge(Chromium)のみをサポートしています
 
 + **Internet Explorer**  
 https://selenium.dev/downloads/  
