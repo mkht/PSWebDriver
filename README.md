@@ -33,7 +33,7 @@ https://selenium.dev/downloads/
 Google Chromeを使用して[DuckDuckGo](https://duckduckgo.com/)を開き、"PowerShell"と検索、検索結果のスクリーンショットを取得してブラウザを終了する例
 ```PowerShell
 #インスタンスの生成
-$Browser = New-PSWebDriver 'Chrome' #Chrome/Firefox/Edge/EdgeChromium/IE/HeadlessChrome/HeadlessFirefox
+$Browser = New-PSWebDriver 'Chrome' #Chrome/Firefox/Edge/IE/HeadlessChrome/HeadlessFirefox
 #ブラウザを起動
 $Browser.Start()
 #DuckDuckGoを開く
