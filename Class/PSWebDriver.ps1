@@ -839,6 +839,26 @@ class PSWebDriver {
         }
     }
     #endregion
+    
+    #region Scroll
+    [void]ScrollToElement([Selector]$Target){
+        if($targetElement = $this.FindElement($Target)){
+            $null = $this.ExecuteScript('arguments[0].scrollIntoView();', $targetElement)
+        }
+    }
+
+    [void]ScrollToAbsolute([int]$x, [int]$y){
+        $null = $this.ExecuteScript("window.scrollTo($x, $y);")
+    }
+
+    [void]ScrollToRelative([int]$x, [int]$y){
+        $null = $this.ExecuteScript("window.scrollBy($x, $y);")
+    }
+
+    [void]ScrollToTop(){
+        $this.ScrollToAbsolute(0, 0)
+    }
+    #endregion
 
     #region Method:SaveScreenShot()
     [void]SaveScreenShot([string]$FileName, [ImageFormat]$ImageFormat) {

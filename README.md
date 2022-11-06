@@ -115,7 +115,10 @@ $WebDriver = New-PSWebDriver -Name 'Chrome'
 |SelectFrame([string]$Name)|void|指定した名前のフレームに移動します|
 |SelectWindow([string]$Title)|void|指定したタイトルのウィンドウに移動します|
 |NewWindow()|void|新しいウィンドウを開きます|
-|NewTab()|void|新しいタブを開きます|
+|ScrollToElement([string]$Target)|void|`$Target`(SelectorExpression)で指定される要素が表示される位置にスクロールします|
+|ScrollToAbsolute([int]$x, [int]$y)|void|絶対座標($x, $y)へスクロールします|
+|ScrollToRelative([int]$x, [int]$y)|void|現在の表示位置から($x, $y)px移動します|
+|ScrollToTop()|void|絶対座標(0, 0)へスクロールします|
 
 ##### 待機
 |名前|戻り値型|説明|
