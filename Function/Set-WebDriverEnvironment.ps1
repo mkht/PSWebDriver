@@ -64,8 +64,9 @@ function Set-ChromeEnvironment {
     
     begin {
         $DriverSavePath = Join-Path $env:USERPROFILE '.webdriver\chromedriver'
-        $WebDriverQueryLocation = 'https://chromedriver.storage.googleapis.com/LATEST_RELEASE'
-        $WebDriverDownloadLocation = 'https://chromedriver.storage.googleapis.com/'
+        $WebDriverQueryLocationOld = 'https://chromedriver.storage.googleapis.com/LATEST_RELEASE'
+        $WebDriverQueryLocationNew = 'https://googlechromelabs.github.io/chrome-for-testing/known-good-versions-with-downloads.json'
+        $WebDriverDownloadLocationOld = 'https://chromedriver.storage.googleapis.com/'
         $SearchBrowserPaths = if ($BrowserBinaryPath) {
             @($BrowserBinaryPath)
         }
@@ -106,8 +107,17 @@ function Set-ChromeEnvironment {
         }
 
         # Query a recommend version of the webdriver
-        $QueryURL = $WebDriverQueryLocation + ('_{0}.{1}.{2}' -f $BrowserVersion.Major, $BrowserVersion.Minor, $BrowserVersion.Build)
-        $DriverVersion = (Invoke-WebRequest -Uri $QueryURL -UseBasicParsing -ErrorAction Ignore).Content
+        if ($BrowserVersion.Major -ge 115) {
+            $QueryContent = try { (Invoke-RestMethod -Uri $WebDriverQueryLocationNew -UseBasicParsing -ErrorAction Stop) }catch {}
+            $t = $QueryContent.versions | ? { $_.version -like (($BrowserVersion.Major, $BrowserVersion.Minor, $BrowserVersion.Build, '*') -join '.') } | select -First 1
+            $DriverVersion = $t.version
+            $WebDriverDownloadLocation = $t.downloads.chromedriver | ? { $_.platform -eq 'win32' } | select -First 1 -ExpandProperty url
+        }
+        else {
+            $QueryURL = $WebDriverQueryLocationOld + ('_{0}.{1}.{2}' -f $BrowserVersion.Major, $BrowserVersion.Minor, $BrowserVersion.Build)
+            $DriverVersion = try { (Invoke-WebRequest -Uri $QueryURL -UseBasicParsing -ErrorAction Stop).Content }catch {}
+            $WebDriverDownloadLocation = $WebDriverDownloadLocationOld + ('{0}/{1}' -f $DriverVersion, 'chromedriver_win32.zip')
+        }
 
         # recommend driver does not found
         if (-not $DriverVersion) {
@@ -133,11 +143,13 @@ function Set-ChromeEnvironment {
         # download web driver
         if (-not $IsCurrentDriverPresent) {
             $TempPath = Join-Path $env:TEMP 'chromedriver_win32.zip'
-            $WebDriverDownloadLocation = $WebDriverDownloadLocation + ('{0}/{1}' -f $DriverVersion, 'chromedriver_win32.zip')
             Write-Verbose "Download driver from $WebDriverDownloadLocation"
             try {
                 Invoke-WebRequest -Uri $WebDriverDownloadLocation -OutFile $TempPath -UseBasicParsing -ErrorAction Stop
                 Expand-Archive -Path $TempPath -DestinationPath $DriverSavePath -Force -ErrorAction Stop
+                if ($BrowserVersion.Major -ge 115) {
+                    Get-ChildItem (Join-Path $DriverSavePath 'chromedriver-win32') | Copy-Item -Destination $DriverSavePath -Force
+                }
             }
             catch {
                 Write-Error 'Failed to download driver'
