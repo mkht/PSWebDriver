@@ -447,11 +447,11 @@ Describe 'GetHttpStatusCode()' {
 
     It 'Return Http Status 404' {
         #Emulate 404 using Mock is difficult...
-        $Driver.GetHttpStatusCode('https://httpstat.us/404') | Should -BeExactly 404
+        $Driver.GetHttpStatusCode('https://httpbin.org/status/404') | Should -BeExactly 404
     }
     
     It 'Return Http Status 200' {
-        $Driver.GetHttpStatusCode('https://httpstat.us/200') | Should -BeExactly 200
+        $Driver.GetHttpStatusCode('https://httpbin.org/status/200') | Should -BeExactly 200
     }
 }
 
