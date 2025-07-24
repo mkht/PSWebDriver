@@ -402,7 +402,19 @@ function Set-FirefoxEnvironment {
     
     process {
         # Query latest driver url
-        $LatestRelease = (Invoke-WebRequest -Uri $WebDriverQueryLocation -UseBasicParsing -ErrorAction Ignore).Content | ConvertFrom-Json
+        $IwrParam = @{
+            Uri = $WebDriverQueryLocation 
+            UseBasicParsing = $true
+            ErrorAction = 'Ignore'
+        }
+        # If GITHUB_TOKEN is set, use it for authentication
+        # This is useful for avoiding rate limits on GitHub API requests
+        if ($env:GITHUB_TOKEN) {
+            Write-Verbose 'Using Env:GITHUB_TOKEN for authentication'
+            $IwrParam.Headers = @{ 'Authorization' = "Bearer $env:GITHUB_TOKEN" }
+        }
+
+        $LatestRelease = (Invoke-WebRequest @IwrParam).Content | ConvertFrom-Json
         if (-not $LatestRelease.name) {
             Write-Error 'Could not found latest release of the GeckoDriver. Confirm network connection'
             return
