@@ -6,16 +6,15 @@
 #Requires -Version 5.0
 #Requires -Modules @{ ModuleName="Pester"; ModuleVersion="5.0.2" }
 
-# Import module
-$script:moduleRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
-Get-Module 'PSWebDriver' | Remove-Module -Force
-Import-Module (Join-Path $script:moduleRoot './PSWebDriver.psd1') -Force
-
-# TestData
-$script:moduleRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
-$script:TestData = Join-Path $script:moduleRoot '\Tests\TestData\index.html'
-
 BeforeAll {
+    # Import module
+    $script:moduleRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+    Get-Module 'PSWebDriver' | Remove-Module -Force
+    Import-Module (Join-Path $script:moduleRoot './PSWebDriver.psd1') -Force
+
+    # TestData
+    $script:TestData = Join-Path $script:moduleRoot '\Tests\TestData\index.html'
+
     # Specify Browser
     if (-not $env:TARGET_BROWSER) {
         $global:Browser = 'Chrome'
